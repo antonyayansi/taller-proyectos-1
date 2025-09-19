@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue'
 import { supabase } from '@/services/supabase/supabase';
 import Button from 'primevue/button';
 import { useDark } from '@vueuse/core'
+import mapboxgl from 'mapbox-gl'
 
 const isDark = useDark()
 
@@ -12,6 +13,7 @@ const toggleLight = () => {
 
 const sitios = ref([])
 
+const mapView = ref(null);
 
 onMounted(async () => {
     const {
@@ -24,11 +26,23 @@ onMounted(async () => {
         sitios.value = data
         console.log(sitios.value)
     }
+    mapboxgl.accessToken = 'pk.eyJ1Ijoicm9uYWxkbzE1OTM5IiwiYSI6ImNtZnJlMDN3OTA4ZWcya3E0YTc5eW54dmMifQ.RqsLNCYJNBHSGMaQWN6lew';
+
+    const map = new mapboxgl.Map({
+        container: 'mapa',
+        style: 'mapbox://styles/mapbox/streets-v12', // style URL
+        center: [-74.5, 40], // starting position [lng, lat]
+        zoom: 9, // starting zoom
+        telemetry: false
+    });
 })
+
 
 </script>
 
 <template>
+    <div id="mapa">
+    </div>
     <Button label="modo noche" @click="toggleLight" />
     <div>
         <h1>Sitios Turísticos</h1>
@@ -43,5 +57,7 @@ onMounted(async () => {
         <div v-else>
             <p>Cargando sitios...</p>
         </div>
+
+
     </div>
 </template>
