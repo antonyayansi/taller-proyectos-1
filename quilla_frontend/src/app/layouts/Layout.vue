@@ -1,13 +1,15 @@
 <template>
-    <div>
+    <div class="flex flex-col justify-between min-h-screen">
         <header>
             Header
         </header>
         <main>
             <RouterView />
         </main>
-        <div>
-            Menu abajo
-        </div>
+        <Menu />
     </div>
 </template>
+
+<script setup>
+import Menu from '../components/Menu.vue';
+</script>
