@@ -11,12 +11,21 @@
             <div class="flex items-center justify-between mb-2">
                 <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Mapa</span>
                 <div class="flex items-center space-x-2">
-                    <div v-if="ubicacionActual" class="flex items-center text-xs text-green-600 dark:text-green-400">
+                    <div v-if="ubicacionActual && watchId"
+                        class="flex items-center text-xs text-green-600 dark:text-green-400">
                         <div class="w-2 h-2 bg-green-500 rounded-full mr-1 animate-pulse"></div>
+                        Ubicación en seguimiento
+                    </div>
+                    <div v-else-if="ubicacionActual" class="flex items-center text-xs text-blue-600 dark:text-blue-400">
+                        <div class="w-2 h-2 bg-blue-500 rounded-full mr-1"></div>
                         Ubicación detectada
                     </div>
+                    <div v-else-if="errorUbicacion" class="flex items-center text-xs text-red-600 dark:text-red-400">
+                        <div class="w-2 h-2 bg-red-500 rounded-full mr-1"></div>
+                        Error de ubicación
+                    </div>
                     <div v-else class="flex items-center text-xs text-gray-500 dark:text-gray-400">
-                        <div class="w-2 h-2 bg-gray-400 rounded-full mr-1"></div>
+                        <div class="w-2 h-2 bg-gray-400 rounded-full mr-1 animate-pulse"></div>
                         Obteniendo ubicación...
                     </div>
                 </div>
@@ -72,49 +81,89 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { supabase } from '@/services/supabase/supabase';
-import Button from 'primevue/button';
-import { useDark } from '@vueuse/core'
 import mapboxgl from 'mapbox-gl'
-
-const isDark = useDark()
-
-const toggleLight = () => {
-    isDark.value = !isDark.value;
-}
+import { Geolocation } from '@capacitor/geolocation'
 
 const sitios = ref([])
 const ubicacionActual = ref(null)
 const map = ref(null)
+const watchId = ref(null)
+const errorUbicacion = ref(null)
 
-const obtenerUbicacion = () => {
-    return new Promise((resolve, reject) => {
-        if (!navigator.geolocation) {
-            reject(new Error('Geolocalización no soportada'))
-            return
+const obtenerUbicacion = async () => {
+    try {
+        // Verificar y solicitar permisos de ubicación
+        const permissions = await Geolocation.checkPermissions()
+
+        if (permissions.location === 'denied') {
+            const requestResult = await Geolocation.requestPermissions()
+            if (requestResult.location === 'denied') {
+                throw new Error('Permisos de ubicación denegados')
+            }
         }
 
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
+        // Obtener la posición actual usando Capacitor
+        const position = await Geolocation.getCurrentPosition({
+            enableHighAccuracy: true,
+            timeout: 10000
+        })
+
+        const coords = {
+            lng: position.coords.longitude,
+            lat: position.coords.latitude
+        }
+
+        ubicacionActual.value = coords
+        errorUbicacion.value = null
+        console.log('Ubicación obtenida:', coords)
+        return coords
+
+    } catch (error) {
+
+        console.error('Error obteniendo ubicación con Capacitor:', error)
+        errorUbicacion.value = error
+        throw error
+    }
+}
+
+// Función para observar cambios en la ubicación
+const iniciarSeguimientoUbicacion = async () => {
+    try {
+        watchId.value = await Geolocation.watchPosition({
+            enableHighAccuracy: true,
+            timeout: 30000
+        }, (position, err) => {
+            if (err) {
+                console.error('Error en seguimiento de ubicación:', err)
+                return
+            }
+
+            if (position) {
                 const coords = {
                     lng: position.coords.longitude,
                     lat: position.coords.latitude
                 }
                 ubicacionActual.value = coords
-                resolve(coords)
-            },
-            (error) => {
-                console.error('Error obteniendo ubicación:', error)
-                reject(error)
-            },
-            {
-                enableHighAccuracy: true,
-                timeout: 10000,
-                maximumAge: 60000
+
+                // Actualizar marcador en el mapa si existe
+                if (map.value && map.value.marcadorUbicacion) {
+                    map.value.marcadorUbicacion.setLngLat([coords.lng, coords.lat])
+                }
             }
-        )
-    })
+        })
+    } catch (error) {
+        console.error('Error iniciando seguimiento:', error)
+    }
+}
+
+// Función para detener el seguimiento
+const detenerSeguimientoUbicacion = async () => {
+    if (watchId.value) {
+        await Geolocation.clearWatch({ id: watchId.value })
+        watchId.value = null
+    }
 }
 
 onMounted(async () => {
@@ -155,14 +204,11 @@ onMounted(async () => {
             .setPopup(new mapboxgl.Popup().setHTML('<div class="text-center"><strong>📍 Tu ubicación</strong></div>'))
             .addTo(map.value);
 
-        // Agregar control de geolocalización
-        map.value.addControl(new mapboxgl.GeolocateControl({
-            positionOptions: {
-                enableHighAccuracy: true
-            },
-            trackUserLocation: true,
-            showUserHeading: true
-        }));
+        // Guardar referencia del marcador para poder actualizarlo
+        map.value.marcadorUbicacion = marcadorUbicacion
+
+        // Iniciar seguimiento de ubicación
+        await iniciarSeguimientoUbicacion()
 
     } catch (error) {
         console.error('No se pudo obtener la ubicación:', error)
@@ -176,6 +222,11 @@ onMounted(async () => {
             telemetry: false
         });
     }
+})
+
+// Limpiar seguimiento al desmontar el componente
+onUnmounted(async () => {
+    await detenerSeguimientoUbicacion()
 })
 
 
