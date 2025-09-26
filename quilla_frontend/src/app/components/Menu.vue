@@ -99,24 +99,18 @@ const updateHighlight = () => {
     highlightStyle.transform = `translateX(${itemOffsetLeft}px)`;
 };
 
-// Observador que se activa cada vez que la ruta cambia
 watch(() => route.name, async () => {
-    // **LA CORRECCIÓN CLAVE**
-    // Esperamos al siguiente ciclo de actualización del DOM antes de calcular
+
     await nextTick();
     updateHighlight();
 });
 
-// Se ejecuta cuando el componente se monta para establecer la posición inicial
 onMounted(async () => {
-    // Esperamos a que el DOM esté completamente renderizado
     await nextTick();
     updateHighlight();
-    // Añadimos un listener para actualizar la posición si la ventana cambia de tamaño
     window.addEventListener('resize', updateHighlight);
 });
 
-// Es buena práctica limpiar los listeners cuando el componente se destruye
 onUnmounted(() => {
     window.removeEventListener('resize', updateHighlight);
 });
