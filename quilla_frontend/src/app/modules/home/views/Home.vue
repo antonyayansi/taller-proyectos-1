@@ -73,110 +73,75 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { supabase } from '@/services/supabase/supabase';
 import Button from 'primevue/button';
 import { useDark } from '@vueuse/core'
 import mapboxgl from 'mapbox-gl'
+import { storeToRefs } from 'pinia';
+import { useHomeStore } from '@/app/modules/home/store/home'
+
+
 
 const isDark = useDark()
+
+const homeStore = useHomeStore();
+const { sitios } = storeToRefs(homeStore)
+
+
 
 const toggleLight = () => {
     isDark.value = !isDark.value;
 }
 
-const sitios = ref([])
-const ubicacionActual = ref(null)
-const map = ref(null)
-
-const obtenerUbicacion = () => {
-    return new Promise((resolve, reject) => {
-        if (!navigator.geolocation) {
-            reject(new Error('Geolocalización no soportada'))
-            return
-        }
-
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                const coords = {
-                    lng: position.coords.longitude,
-                    lat: position.coords.latitude
-                }
-                ubicacionActual.value = coords
-                resolve(coords)
-            },
-            (error) => {
-                console.error('Error obteniendo ubicación:', error)
-                reject(error)
-            },
-            {
-                enableHighAccuracy: true,
-                timeout: 10000,
-                maximumAge: 60000
-            }
-        )
-    })
-}
-
 onMounted(async () => {
-    // Cargar sitios turísticos
-    const {
-        data, error
-    } = await supabase.from('sitios').select('id, nombre, descripcion')
-
-    if (error) {
-        console.log('Se produjo un error', error)
-    } else {
-        sitios.value = data
-        console.log(sitios.value)
-    }
-
-    // Configurar Mapbox
+    await homeStore.fetchSitios();
     mapboxgl.accessToken = 'pk.eyJ1Ijoicm9uYWxkbzE1OTM5IiwiYSI6ImNtZnJlMDN3OTA4ZWcya3E0YTc5eW54dmMifQ.RqsLNCYJNBHSGMaQWN6lew';
 
-    try {
-        // Obtener ubicación actual
-        const coords = await obtenerUbicacion()
+    const map = new mapboxgl.Map({
+        container: 'mapa',
+        style: 'mapbox://styles/mapbox/streets-v12',
+        center: [-74.5, 40],
+        zoom: 9,
+        telemetry: false
+    });
 
-        // Inicializar mapa centrado en la ubicación actual
-        map.value = new mapboxgl.Map({
-            container: 'mapa',
-            style: 'mapbox://styles/mapbox/streets-v12',
-            center: [coords.lng, coords.lat], // Centrar en ubicación actual
-            zoom: 14, // Zoom más cercano para ver la ubicación
-            telemetry: false
-        });
+    const geolocate = new mapboxgl.GeolocateControl({
+        positionOptions: {
+            enableHighAccuracy: true
+        },
+        trackUserLocation: true,
+        showUserHeading: true
+    });
 
-        // Agregar marcador de ubicación actual
-        const marcadorUbicacion = new mapboxgl.Marker({
-            color: '#3b82f6', // Color azul
-            scale: 1.2
-        })
-            .setLngLat([coords.lng, coords.lat])
-            .setPopup(new mapboxgl.Popup().setHTML('<div class="text-center"><strong>📍 Tu ubicación</strong></div>'))
-            .addTo(map.value);
+    map.addControl(geolocate);
 
-        // Agregar control de geolocalización
-        map.value.addControl(new mapboxgl.GeolocateControl({
-            positionOptions: {
-                enableHighAccuracy: true
-            },
-            trackUserLocation: true,
-            showUserHeading: true
-        }));
-
-    } catch (error) {
-        console.error('No se pudo obtener la ubicación:', error)
-
-        // Fallback: mapa con ubicación por defecto
-        map.value = new mapboxgl.Map({
-            container: 'mapa',
-            style: 'mapbox://styles/mapbox/streets-v12',
-            center: [-74.5, 40], // Ubicación por defecto
-            zoom: 9,
-            telemetry: false
-        });
-    }
+    map.on('load', () => {
+        geolocate.trigger();
+    });
 })
-
-
 </script>
+
+<template>
+    <Button label="modo noche" @click="toggleLight" />
+
+    <div>
+        <h1>Sitios Turísticos</h1>
+    </div>
+
+    <div class="relative w-full h-[500px] rounded-2xl overflow-hidden mt-64">
+
+        <div id="mapa" class="w-full h-full"></div>
+
+        <div class="absolute z-20 top-5 left-0 right-0">
+            <h2 class="text-center text-2xl font-bold text-primary [text-shadow:0_1px_3px_rgb(0_0_0_/_0.5)]">
+                Tu ubicación
+            </h2>
+        </div>
+
+        <div
+            class="absolute inset-0 pointer-events-none z-10 bg-[radial-gradient(circle,transparent_35%,theme(colors.white)_70%)] dark:bg-[radial-gradient(circle,transparent_10%,theme(colors.black)_70%)]">
+        </div>
+
+    </div>
+</template>
+
+<style scoped></style>
