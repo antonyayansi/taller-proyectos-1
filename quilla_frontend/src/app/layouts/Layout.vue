@@ -1,8 +1,8 @@
 <template>
     <div class="flex flex-col justify-between min-h-screen">
-        <header>
+        <!-- <header>
             Header
-        </header>
+        </header> -->
         <main>
             <RouterView />
         </main>

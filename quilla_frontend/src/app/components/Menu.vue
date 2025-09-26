@@ -1,6 +1,6 @@
 <template>
     <footer
-        class="relative grid grid-cols-4 gap-4 p-4 border-t-2 rounded-t-3xl border-zinc-200 dark:border-zinc-700 dark:bg-zinc-800 bg-zinc-100">
+        class="sticky bottom-0 grid grid-cols-4 gap-4 p-4 border-t-2 rounded-t-3xl border-zinc-200 dark:border-zinc-700 dark:bg-zinc-800 bg-zinc-100">
 
         <!-- El elemento que se moverá para resaltar la opción activa -->
         <div class="absolute h-12 bg-primary-500 rounded-full transition-all duration-300 ease-in-out"
