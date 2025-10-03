@@ -1,9 +1,6 @@
 <template>
     <!-- <Button label="modo noche" @click="toggleLight" /> -->
     <div class="px-4 py-6 bg-zinc-50 dark:bg-zinc-900 min-h-screen">
-        <h1 class="text-2xl font-bold text-center mb-4 text-zinc-800 dark:text-white">
-            Sitios Turísticos
-        </h1>
         <input
             class="bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-lg shadow-sm w-full px-4 py-2 mb-6 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             placeholder="Buscar..." />
@@ -30,10 +27,17 @@
                     </div>
                 </div>
             </div>
-            <div id="mapa" class="h-48 rounded-lg border border-zinc-200 dark:border-zinc-700 overflow-hidden">
-            </div>
+            <GMapMap :center="mapCenter" :zoom="mapZoom" style="width: 100%; height: 192px"
+                class="rounded-lg border border-zinc-200 dark:border-zinc-700 overflow-hidden" :options="mapOptions">
+                <GMapMarker v-if="ubicacionActual" :position="ubicacionActual" :icon="{
+                    url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+                            <svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 48 48'><g fill='none' stroke-linecap='round' stroke-linejoin='round' stroke-width='4'><path fill='#2f88ff' fill-rule='evenodd' stroke='#000' d='M24 44C35.0457 44 44 35.0457 44 24C44 12.9543 35.0457 4 24 4C12.9543 4 4 12.9543 4 24C4 35.0457 12.9543 44 24 44Z' clip-rule='evenodd'/><path fill='#43ccf8' stroke='#fff' d='M24 13L17 34L24 29L31 34L24 13Z'/></g></svg>
+                        `),
+                    scaledSize: { width: 24, height: 24 }
+                }" />
+            </GMapMap>
         </div>
-        <div v-if="sitios.length > 0" class="space-y-4">
+        <!-- <div v-if="sitios.length > 0" class="space-y-4">
             <div v-for="sitio in sitios" :key="sitio.id"
                 class="bg-white dark:bg-zinc-800 rounded-xl shadow-lg p-6 border border-zinc-200 dark:border-zinc-700 hover:shadow-xl transition-shadow duration-300">
                 <div class="flex items-start space-x-4">
@@ -76,165 +80,31 @@
             <p class="text-zinc-500 dark:text-zinc-400 text-sm mt-2">
                 Esto solo tomará un momento
             </p>
-        </div>
+        </div>-->
     </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { onMounted, onUnmounted } from 'vue'
 import { supabase } from '@/services/supabase/supabase';
-import mapboxgl from 'mapbox-gl'
-import { Geolocation } from '@capacitor/geolocation'
+import useHome from '../hooks/useHome';
 
-const sitios = ref([])
-const ubicacionActual = ref(null)
-const map = ref(null)
-const watchId = ref(null)
-const errorUbicacion = ref(null)
-
-const obtenerUbicacion = async () => {
-    try {
-        // Verificar y solicitar permisos de ubicación
-        const permissions = await Geolocation.checkPermissions()
-
-        if (permissions.location === 'denied') {
-            const requestResult = await Geolocation.requestPermissions()
-            if (requestResult.location === 'denied') {
-                throw new Error('Permisos de ubicación denegados')
-            }
-        }
-
-        // Obtener la posición actual usando Capacitor
-        const position = await Geolocation.getCurrentPosition({
-            enableHighAccuracy: true,
-            timeout: 10000
-        })
-
-        const coords = {
-            lng: position.coords.longitude,
-            lat: position.coords.latitude
-        }
-
-        ubicacionActual.value = coords
-        errorUbicacion.value = null
-        console.log('Ubicación obtenida:', coords)
-        return coords
-
-    } catch (error) {
-
-        console.error('Error obteniendo ubicación con Capacitor:', error)
-        errorUbicacion.value = error
-        throw error
-    }
-}
-
-// Función para observar cambios en la ubicación
-const iniciarSeguimientoUbicacion = async () => {
-    try {
-        watchId.value = await Geolocation.watchPosition({
-            enableHighAccuracy: true,
-            timeout: 30000
-        }, (position, err) => {
-            if (err) {
-                console.error('Error en seguimiento de ubicación:', err)
-                return
-            }
-
-            if (position) {
-                const coords = {
-                    lng: position.coords.longitude,
-                    lat: position.coords.latitude
-                }
-                ubicacionActual.value = coords
-
-                // Actualizar marcador en el mapa si existe
-                if (map.value && map.value.marcadorUbicacion) {
-                    map.value.marcadorUbicacion.setLngLat([coords.lng, coords.lat])
-                }
-            }
-        })
-    } catch (error) {
-        console.error('Error iniciando seguimiento:', error)
-    }
-}
-
-// Función para detener el seguimiento
-const detenerSeguimientoUbicacion = async () => {
-    if (watchId.value) {
-        await Geolocation.clearWatch({ id: watchId.value })
-        watchId.value = null
-    }
-}
+const {
+    iniciarSeguimientoUbicacion,
+    detenerSeguimientoUbicacion,
+    sitios,
+    ubicacionActual,
+    errorUbicacion,
+    watchId,
+    mapCenter,
+    mapZoom,
+    mapOptions,
+    obtenerUbicacion
+} = useHome()
 
 onMounted(async () => {
-    // Cargar sitios turísticos
-    const {
-        data, error
-    } = await supabase.from('sitios').select('id, nombre, descripcion')
-
-    if (error) {
-        console.log('Se produjo un error', error)
-    } else {
-        sitios.value = data
-    }
-
-    // Configurar Mapbox
-    mapboxgl.accessToken = 'pk.eyJ1Ijoicm9uYWxkbzE1OTM5IiwiYSI6ImNtZnJlMDN3OTA4ZWcya3E0YTc5eW54dmMifQ.RqsLNCYJNBHSGMaQWN6lew';
-
-    // Esperar un poco para que el DOM esté completamente listo
-    await new Promise(resolve => setTimeout(resolve, 100));
-
-    // Inicializar mapa con ubicación por defecto (Barranquilla, Colombia)
-    map.value = new mapboxgl.Map({
-        container: 'mapa',
-        style: 'mapbox://styles/mapbox/streets-v11', // Usar v11 por compatibilidad
-        center: [-74.7813, 10.9685], // Barranquilla, Colombia
-        zoom: 12,
-        telemetry: false,
-        attributionControl: false,
-        preserveDrawingBuffer: true
-    });
-
-    // Esperar a que el mapa se cargue completamente
-    map.value.on('load', async () => {
-        console.log('Mapa cargado correctamente');
-
-        try {
-            // Obtener ubicación actual y recentrar
-            const coords = await obtenerUbicacion()
-
-            // Recentrar el mapa en la ubicación actual
-            map.value.flyTo({
-                center: [coords.lng, coords.lat],
-                zoom: 15,
-                speed: 2,
-                curve: 1
-            });
-
-            // Agregar marcador de ubicación actual
-            const marcadorUbicacion = new mapboxgl.Marker({
-                color: '#3b82f6', // Color azul
-                scale: 1.2
-            })
-                .setLngLat([coords.lng, coords.lat])
-                .setPopup(new mapboxgl.Popup().setHTML('<div class="text-center"><strong>📍 Tu ubicación</strong></div>'))
-                .addTo(map.value);
-
-            // Guardar referencia del marcador para poder actualizarlo
-            map.value.marcadorUbicacion = marcadorUbicacion
-
-            // Iniciar seguimiento de ubicación
-            await iniciarSeguimientoUbicacion()
-
-        } catch (error) {
-            console.error('Error obteniendo ubicación:', error)
-            errorUbicacion.value = 'No se pudo obtener tu ubicación'
-        }
-    });
-
-    map.value.on('error', (error) => {
-        console.error('Error del mapa:', error);
-    });
+    await obtenerUbicacion()
+    await iniciarSeguimientoUbicacion()
 })
 
 // Limpiar seguimiento al desmontar el componente
