@@ -1,6 +1,6 @@
 <template>
     <footer
-        class="sticky bottom-0 grid grid-cols-4 gap-4 p-4 border-t-2 rounded-t-3xl border-zinc-200 dark:border-zinc-700 dark:bg-zinc-800 bg-zinc-100">
+        class="sticky bottom-0 z-[50] grid grid-cols-4 gap-4 p-4 border-t-2 rounded-t-3xl border-zinc-200 dark:border-zinc-700 dark:bg-zinc-800 bg-zinc-100">
 
         <!-- El elemento que se moverá para resaltar la opción activa -->
         <div class="absolute h-12 bg-primary-500 rounded-full transition-all duration-300 ease-in-out"
@@ -68,10 +68,10 @@ const route = useRoute();
 
 // Mapa de nombres de ruta a índices para encontrar la referencia correcta
 const routeMap = {
-    home: 0,
-    search: 1,
-    tops: 2,
-    profile: 3,
+    'home.index': 0,
+    'search': 1,
+    'tops': 2,
+    'profile': 3,
 };
 
 const menuItemRefs = ref([]);
@@ -83,7 +83,21 @@ const highlightStyle = reactive({
 
 // Función para actualizar la posición del resaltador
 const updateHighlight = () => {
-    const activeIndex = routeMap[route.name];
+    let activeIndex = routeMap[route.name];
+
+    // Si no encontramos la ruta exacta, intentamos buscar por prefijo
+    if (activeIndex === undefined) {
+        const routeName = route.name;
+        if (routeName && routeName.startsWith('home')) {
+            activeIndex = 0;
+        } else if (routeName && routeName.startsWith('search')) {
+            activeIndex = 1;
+        } else if (routeName && routeName.startsWith('tops')) {
+            activeIndex = 2;
+        } else if (routeName && routeName.startsWith('profile')) {
+            activeIndex = 3;
+        }
+    }
 
     // Nos aseguramos de que el índice y el elemento existan
     if (activeIndex === undefined || !menuItemRefs.value[activeIndex]) {
