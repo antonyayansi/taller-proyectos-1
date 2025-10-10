@@ -1,6 +1,6 @@
 <template>
     <footer
-        class="sticky bottom-0 grid grid-cols-4 gap-4 p-4 border-t-2 rounded-t-3xl border-zinc-200 dark:border-zinc-700 dark:bg-zinc-800 bg-zinc-100">
+        class="sticky bottom-0 z-[50] grid grid-cols-4 gap-4 p-4 border-t-2 rounded-t-3xl border-zinc-200 dark:border-zinc-700 dark:bg-zinc-800 bg-zinc-100">
 
         <!-- El elemento que se moverá para resaltar la opción activa -->
         <div class="absolute h-12 bg-primary-500 rounded-full transition-all duration-300 ease-in-out"
@@ -10,8 +10,8 @@
         <!-- Botón Home -->
         <div class="relative z-10 flex justify-center" :ref="el => menuItemRefs[0] = el">
             <button class="px-4 py-2 transition-colors duration-300"
-                :class="route.name === 'home' ? 'text-white' : 'text-zinc-600 dark:text-zinc-200'"
-                @click="routerTo('home')">
+                :class="route.name === 'home.index' ? 'text-white' : 'text-zinc-600 dark:text-zinc-200'"
+                @click="routerTo('home.index')">
                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
                     <path fill="currentColor"
                         d="M4 19v-9q0-.475.213-.9t.587-.7l6-4.5q.525-.4 1.2-.4t1.2.4l6 4.5q.375.275.588.7T20 10v9q0 .825-.588 1.413T18 21h-3q-.425 0-.712-.288T14 20v-5q0-.425-.288-.712T13 14h-2q-.425 0-.712.288T10 15v5q0 .425-.288.713T9 21H6q-.825 0-1.412-.587T4 19" />
@@ -68,10 +68,10 @@ const route = useRoute();
 
 // Mapa de nombres de ruta a índices para encontrar la referencia correcta
 const routeMap = {
-    home: 0,
-    search: 1,
-    tops: 2,
-    profile: 3,
+    'home.index': 0,
+    'search': 1,
+    'tops': 2,
+    'profile': 3,
 };
 
 const menuItemRefs = ref([]);
@@ -83,7 +83,21 @@ const highlightStyle = reactive({
 
 // Función para actualizar la posición del resaltador
 const updateHighlight = () => {
-    const activeIndex = routeMap[route.name];
+    let activeIndex = routeMap[route.name];
+
+    // Si no encontramos la ruta exacta, intentamos buscar por prefijo
+    if (activeIndex === undefined) {
+        const routeName = route.name;
+        if (routeName && routeName.startsWith('home')) {
+            activeIndex = 0;
+        } else if (routeName && routeName.startsWith('search')) {
+            activeIndex = 1;
+        } else if (routeName && routeName.startsWith('tops')) {
+            activeIndex = 2;
+        } else if (routeName && routeName.startsWith('profile')) {
+            activeIndex = 3;
+        }
+    }
 
     // Nos aseguramos de que el índice y el elemento existan
     if (activeIndex === undefined || !menuItemRefs.value[activeIndex]) {
@@ -122,7 +136,7 @@ onUnmounted(() => {
 });
 
 
-const routerTo = (name = "home") => {
+const routerTo = (name = "home.index") => {
     if (route.name !== name) {
         router.push({ name });
     }

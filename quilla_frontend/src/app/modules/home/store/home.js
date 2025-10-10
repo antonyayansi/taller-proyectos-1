@@ -1,30 +1,62 @@
-// src/app/modules/home/store/home.js
-
 import { defineStore } from 'pinia'
-import { supabase } from '@/services/supabase/supabase'
+import { Geolocation } from '@capacitor/geolocation'
+import { addMarker, loadMapa } from '@/services/gps';
 
-export const useHomeStore = defineStore('home', {
+const initLatLng = { lat: -13.516985, lng: -71.978113 };
+
+export const home = defineStore('home', {
   state: () => ({
-    sitios: [],
+    ubicacionActual: {
+      lat: null,
+      lng: null,
+    },
+    error: null,
+    mapContainer: null, // HTML element container
+    map: null, // Google Maps instance
+    isMapLoaded: false // Flag para saber si el mapa está completamente cargado
   }),
   actions: {
-    async fetchSitios() {
-      if (this.sitios.length > 0) {
-        console.log('Datos ya cargados desde el store')
-        return
+    async obtenerUbicacion(reload = true) {
+      try {
+        const pos = await Geolocation.getCurrentPosition();
+        this.ubicacionActual.lat = pos.coords.latitude;
+        this.ubicacionActual.lng = pos.coords.longitude
+        if (reload) {
+          await this.getMapa()
+        }
+      } catch (error) {
+        this.error = error
       }
+    },
+    async getMapa() {
+      if (!this.mapContainer) {
+        console.warn('Map container not set. Call setMapContainer first.');
+        return;
+      }
+      this.isMapLoaded = false;
 
       try {
-        console.log('Consultando datos desde Supabase...')
-        const { data, error } = await supabase.from('sitios').select('id,nombre,descripcion')
+        if (this.ubicacionActual.lat && this.ubicacionActual.lng) {
+          const data = await loadMapa(
+            this.mapContainer,
+            this.ubicacionActual,
+            'location',
+            false
+          );
+          this.map = data.map;
+        } else {
+          const data = await loadMapa(this.mapContainer, initLatLng, 'location', false, this.getNewLatLng);
+          this.map = data.map;
+        }
 
-        if (error) throw error
-
-        // Asigna los datos al estado
-        this.sitios = data
+        // Marcar el mapa como cargado
+        this.isMapLoaded = true;
       } catch (error) {
-        console.error('Error al cargar los datos:', error)
+        this.isMapLoaded = false;
       }
+    },
+    setMapContainer(element) {
+      this.mapContainer = element;
     },
   },
   getters: {},
