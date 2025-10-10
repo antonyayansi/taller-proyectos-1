@@ -37,7 +37,7 @@
                                     class="text-xs text-blue-600 dark:text-blue-400 font-medium bg-blue-50 dark:bg-blue-900/20 px-2 py-1 rounded-full">
                                     Ver más
                                 </span>
-                                <button class="text-zinc-400 hover:text-red-500 transition-colors duration-200">
+                                <button class="text-zinc-400 hover:text-red-500   ">
                                     <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd"
                                             d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"

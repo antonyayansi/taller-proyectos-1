@@ -33,7 +33,7 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="min-h-screen bg-zinc-50 dark:bg-zinc-900 py-8 transition-colors duration-300">
+    <div class="min-h-screen bg-zinc-50 dark:bg-zinc-900 py-8  ">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <!-- Header -->
             <div class="mb-8">
@@ -53,7 +53,7 @@ onMounted(() => {
 
                     <!-- Toggle de modo oscuro -->
                     <button @click="toggleDarkMode"
-                        class="relative inline-flex items-center p-2 rounded-lg bg-zinc-200 dark:bg-zinc-700 hover:bg-zinc-300 dark:hover:bg-zinc-600 transition-colors duration-200"
+                        class="relative inline-flex items-center p-2 rounded-lg bg-zinc-200 dark:bg-zinc-700 hover:bg-zinc-300 dark:hover:bg-zinc-600   "
                         :title="isDarkMode ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'">
                         <!-- Icono sol (modo claro) -->
                         <svg v-if="!isDarkMode" class="w-6 h-6 text-yellow-500" fill="none" stroke="currentColor"
@@ -77,8 +77,7 @@ onMounted(() => {
             <NarratorConfig />
 
             <!-- Otras configuraciones pueden ir aquí -->
-            <div
-                class="bg-white dark:bg-zinc-800 rounded-lg shadow-md dark:shadow-zinc-900/30 p-6 transition-colors duration-300">
+            <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-md dark:shadow-zinc-900/30 p-6  ">
                 <h2 class="text-xl font-bold text-zinc-800 dark:text-white mb-4 flex items-center">
                     <svg class="w-5 h-5 mr-2 text-zinc-600 dark:text-zinc-300" fill="none" stroke="currentColor"
                         viewBox="0 0 24 24">

@@ -1,14 +1,7 @@
 <template>
-    <div
-        class="bg-white dark:bg-zinc-800 rounded-lg shadow-md dark:shadow-zinc-900/30 p-6 mb-6 transition-colors duration-300">
+    <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-md dark:shadow-zinc-900/30 p-6 mb-6  ">
         <div class="flex items-center justify-between mb-6">
-            <h2 class="text-2xl font-bold text-zinc-800 dark:text-white flex items-center">
-                <svg class="w-6 h-6 mr-2 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor"
-                    viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M15.536 7.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 14.142M8 7h4l2-2h3a2 2 0 012 2v4.586">
-                    </path>
-                </svg>
+            <h2 class="text-xl font-bold text-zinc-800 dark:text-white flex items-center">
                 Configuración del Narrador
             </h2>
             <label class="relative inline-flex items-center cursor-pointer">
@@ -30,7 +23,7 @@
                         Idioma
                     </label>
                     <select v-model="localConfig.language" @change="onLanguageChange"
-                        class="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-600 rounded-md shadow-sm bg-white dark:bg-zinc-700 text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 transition-colors duration-200">
+                        class="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-600 rounded-md shadow-sm bg-white dark:bg-zinc-700 text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400   ">
                         <option value="es-US">Español (Estados Unidos)</option>
                         <option value="es-ES">Español (España)</option>
                         <option value="es-MX">Español (México)</option>
@@ -48,7 +41,7 @@
                         Tipo de Voz
                     </label>
                     <select v-model="localConfig.voice" @change="updateConfig"
-                        class="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-600 rounded-md shadow-sm bg-white dark:bg-zinc-700 text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 transition-colors duration-200">
+                        class="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-600 rounded-md shadow-sm bg-white dark:bg-zinc-700 text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400   ">
                         <option v-for="voice in availableVoices" :key="voice.value" :value="voice.value">
                             {{ voice.label }}
                         </option>
@@ -104,7 +97,7 @@
                     Perfil de Audio
                 </label>
                 <select v-model="localConfig.effectsProfile" @change="updateConfig"
-                    class="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-600 rounded-md shadow-sm bg-white dark:bg-zinc-700 text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 transition-colors duration-200">
+                    class="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-600 rounded-md shadow-sm bg-white dark:bg-zinc-700 text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400   ">
                     <option value="small-bluetooth-speaker-class-device">Altavoz Bluetooth Pequeño</option>
                     <option value="medium-bluetooth-speaker-class-device">Altavoz Bluetooth Mediano</option>
                     <option value="large-home-entertainment-class-device">Sistema de Entretenimiento</option>

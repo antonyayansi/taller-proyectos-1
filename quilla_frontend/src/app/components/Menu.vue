@@ -9,7 +9,7 @@
 
         <!-- Botón Home -->
         <div class="relative z-10 flex justify-center" :ref="el => menuItemRefs[0] = el">
-            <button class="px-4 py-2 transition-colors duration-300"
+            <button class="px-4 py-2  "
                 :class="route.name === 'home.index' ? 'text-white' : 'text-zinc-600 dark:text-zinc-200'"
                 @click="routerTo('home.index')">
                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
@@ -21,7 +21,7 @@
 
         <!-- Botón Search -->
         <div class="relative z-10 flex justify-center" :ref="el => menuItemRefs[1] = el">
-            <button class="px-4 py-2 transition-colors duration-300"
+            <button class="px-4 py-2  "
                 :class="route.name === 'search' ? 'text-white' : 'text-zinc-600 dark:text-zinc-200'"
                 @click="routerTo('search')">
                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
@@ -33,7 +33,7 @@
 
         <!-- Botón Tops -->
         <div class="relative z-10 flex justify-center" :ref="el => menuItemRefs[2] = el">
-            <button class="px-4 py-2 transition-colors duration-300"
+            <button class="px-4 py-2  "
                 :class="route.name === 'tops' ? 'text-white' : 'text-zinc-600 dark:text-zinc-200'"
                 @click="routerTo('tops')">
                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
@@ -45,7 +45,7 @@
 
         <!-- Botón Profile -->
         <div class="relative z-10 flex justify-center" :ref="el => menuItemRefs[3] = el">
-            <button class="px-4 py-2 transition-colors duration-300"
+            <button class="px-4 py-2  "
                 :class="route.name === 'profile' ? 'text-white' : 'text-zinc-600 dark:text-zinc-200'"
                 @click="routerTo('profile')">
                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
