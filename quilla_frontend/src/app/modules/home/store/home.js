@@ -1,98 +1,62 @@
 import { defineStore } from 'pinia'
 import { Geolocation } from '@capacitor/geolocation'
-import Decimal from 'decimal.js-light'
+import { addMarker, loadMapa } from '@/services/gps';
+
+const initLatLng = { lat: -13.516985, lng: -71.978113 };
 
 export const home = defineStore('home', {
   state: () => ({
-    sitios: [],
     ubicacionActual: {
       lat: null,
       lng: null,
     },
-    loading: false,
     error: null,
-    watchId: null,
-    mapCenter: { lat: 10.9685, lng: -74.7813 }, // Barranquilla, Colombia
-    mapZoom: 12,
-    mapOptions: {
-      disableDefaultUI: false,
-      zoomControl: true,
-      mapTypeControl: false,
-      scaleControl: false,
-      streetViewControl: false,
-      rotateControl: false,
-      fullscreenControl: false,
-      styles: [], // Puedes agregar estilos personalizados aquí
-    },
+    mapContainer: null, // HTML element container
+    map: null, // Google Maps instance
+    isMapLoaded: false // Flag para saber si el mapa está completamente cargado
   }),
   actions: {
-    async obtenerUbicacion() {
+    async obtenerUbicacion(reload = true) {
       try {
-        // Verificar y solicitar permisos de ubicación
-        const permissions = await Geolocation.checkPermissions()
-
-        if (permissions.location === 'denied') {
-          const requestResult = await Geolocation.requestPermissions()
-          if (requestResult.location === 'denied') {
-            throw new Error('Permisos de ubicación denegados')
-          }
+        const pos = await Geolocation.getCurrentPosition();
+        this.ubicacionActual.lat = pos.coords.latitude;
+        this.ubicacionActual.lng = pos.coords.longitude
+        if (reload) {
+          await this.getMapa()
         }
-
-        // Obtener la posición actual usando Capacitor
-        const position = await Geolocation.getCurrentPosition({
-          enableHighAccuracy: true,
-          timeout: 10000,
-        })
-
-        const coords = {
-          lat: new Decimal(position.coords.latitude).toNumber(),
-          lng: new Decimal(position.coords.longitude).toNumber(),
-        }
-
-        this.ubicacionActual = coords
-        this.error = null
-
-        // Actualizar el centro del mapa
-        this.mapCenter = coords
-        this.mapZoom = 15
-        return coords
       } catch (error) {
-        errorUbicacion.value = error
-        throw error
+        this.error = error
       }
     },
-    async iniciarSeguimientoUbicacion() {
-      try {
-        this.watchId = await Geolocation.watchPosition(
-          {
-            enableHighAccuracy: true,
-            timeout: 30000,
-          },
-          (position, err) => {
-            if (err) {
-              console.error('Error en seguimiento de ubicación:', err)
-              return
-            }
+    async getMapa() {
+      if (!this.mapContainer) {
+        console.warn('Map container not set. Call setMapContainer first.');
+        return;
+      }
+      this.isMapLoaded = false;
 
-            if (position) {
-              const coords = {
-                lat: new Decimal(position.coords.latitude).toNumber(),
-                lng: new Decimal(position.coords.longitude).toNumber(),
-              }
-              this.ubicacionActual = coords
-              this.mapCenter = coords
-            }
-          },
-        )
+      try {
+        if (this.ubicacionActual.lat && this.ubicacionActual.lng) {
+          const data = await loadMapa(
+            this.mapContainer,
+            this.ubicacionActual,
+            'location',
+            false
+          );
+          this.map = data.map;
+        } else {
+          const data = await loadMapa(this.mapContainer, initLatLng, 'location', false, this.getNewLatLng);
+          this.map = data.map;
+        }
+
+        // Marcar el mapa como cargado
+        this.isMapLoaded = true;
       } catch (error) {
-        console.error('Error iniciando seguimiento:', error)
+        this.isMapLoaded = false;
       }
     },
-    async detenerSeguimientoUbicacion() {
-      if (this.watchId) {
-        await Geolocation.clearWatch({ id: this.watchId })
-        this.watchId = null
-      }
+    setMapContainer(element) {
+      this.mapContainer = element;
     },
   },
   getters: {},

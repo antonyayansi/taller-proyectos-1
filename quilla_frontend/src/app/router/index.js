@@ -1,3 +1,5 @@
+import routerHome from '../modules/home/router';
+
 export default {
   name: 'app',
   path: '/',
@@ -6,7 +8,7 @@ export default {
     {
       name: 'home',
       path: '',
-      component: () => import('../modules/home/views/Home.vue'),
+      ...routerHome
     },
     {
       name: 'search',

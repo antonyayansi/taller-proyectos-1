@@ -10,8 +10,8 @@
         <!-- Botón Home -->
         <div class="relative z-10 flex justify-center" :ref="el => menuItemRefs[0] = el">
             <button class="px-4 py-2 transition-colors duration-300"
-                :class="route.name === 'home' ? 'text-white' : 'text-zinc-600 dark:text-zinc-200'"
-                @click="routerTo('home')">
+                :class="route.name === 'home.index' ? 'text-white' : 'text-zinc-600 dark:text-zinc-200'"
+                @click="routerTo('home.index')">
                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
                     <path fill="currentColor"
                         d="M4 19v-9q0-.475.213-.9t.587-.7l6-4.5q.525-.4 1.2-.4t1.2.4l6 4.5q.375.275.588.7T20 10v9q0 .825-.588 1.413T18 21h-3q-.425 0-.712-.288T14 20v-5q0-.425-.288-.712T13 14h-2q-.425 0-.712.288T10 15v5q0 .425-.288.713T9 21H6q-.825 0-1.412-.587T4 19" />
@@ -122,7 +122,7 @@ onUnmounted(() => {
 });
 
 
-const routerTo = (name = "home") => {
+const routerTo = (name = "home.index") => {
     if (route.name !== name) {
         router.push({ name });
     }

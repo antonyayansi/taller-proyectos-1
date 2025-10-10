@@ -7,8 +7,8 @@ const useHome = () => {
   return {
     ...storeHome,
     obtenerUbicacion: home().obtenerUbicacion,
-    iniciarSeguimientoUbicacion: home().iniciarSeguimientoUbicacion,
-    detenerSeguimientoUbicacion: home().detenerSeguimientoUbicacion,
+    getMapa: home().getMapa,
+    setMapContainer: home().setMapContainer,
   }
 }
 
