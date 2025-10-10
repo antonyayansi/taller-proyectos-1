@@ -2,10 +2,13 @@ import { addMarker, calculateDistance } from "@/services/gps";
 import { supabase } from "@/services/supabase/supabase";
 import { defineStore } from "pinia";
 import useHome from "../hooks/useHome";
+import { home } from "./home";
 
 const {
     ubicacionActual
 } = useHome()
+
+const homeStore = home()
 
 export const sitios = defineStore("sitios", {
     state: () => ({
@@ -84,7 +87,7 @@ export const sitios = defineStore("sitios", {
                     ...data,
                     distancia: distancia.toFixed(2)
                 };
-
+                await this.textToSpeech(this.sitioActive.descripcion);
                 return this.sitioActive;
             } catch (e) {
                 console.error('Error fetching sitio by id:', e);
@@ -118,6 +121,67 @@ export const sitios = defineStore("sitios", {
                 sitio.nombre.toLowerCase().includes(lowerQuery) ||
                 sitio.descripcion.toLowerCase().includes(lowerQuery)
             );
+        },
+        async textToSpeech(text) {
+            // Cargar configuración del narrador
+            homeStore.loadNarratorConfig();
+            const config = homeStore.narratorConfig;
+
+            // Si el narrador está desactivado, no hacer nada
+            if (!config.enabled) {
+                return;
+            }
+
+            let text_sub = text;
+
+            try {
+                const apiKey = "AIzaSyClgb1ViE6cjIMaDTobCLHxUcJk6AutcLk";
+                const endpoint = `https://texttospeech.googleapis.com/v1beta1/text:synthesize?key=${apiKey}`;
+
+                const payload = {
+                    "audioConfig": {
+                        "audioEncoding": "MP3",
+                        "effectsProfileId": [
+                            config.effectsProfile
+                        ],
+                        "pitch": config.pitch,
+                        "speakingRate": config.speakingRate
+                    },
+                    "input": {
+                        "text": text_sub
+                    },
+                    "voice": {
+                        "languageCode": config.language,
+                        "name": config.voice
+                    }
+                };
+
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Error en la solicitud de text-to-speech');
+                }
+
+                const result = await response.json();
+
+                // Decodificar el audio base64 y reproducirlo
+                const audioBytes = result.audioContent;
+                const audioBlob = new Blob([Uint8Array.from(atob(audioBytes), c => c.charCodeAt(0))], {
+                    type: 'audio/mp3'
+                });
+
+                const audio = new Audio(URL.createObjectURL(audioBlob));
+                audio.volume = config.volume;
+                audio.play();
+            } catch (error) {
+                console.error('Error en textToSpeech:', error);
+            }
         }
     },
 });

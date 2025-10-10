@@ -10,6 +10,10 @@ const router = createRouter({
       ...routerApp
     }
   ],
+  scrollBehavior(to, from, savedPosition) {
+    // Si se cambia de ruta siempre tomara la posición superior
+    return { top: 0 };
+  },
 })
 
 export default router

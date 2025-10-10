@@ -13,9 +13,25 @@ export const home = defineStore('home', {
     error: null,
     mapContainer: null, // HTML element container
     map: null, // Google Maps instance
-    isMapLoaded: false // Flag para saber si el mapa está completamente cargado
+    isMapLoaded: false, // Flag para saber si el mapa está completamente cargado
+
+    // Configuración del narrador
+    narratorConfig: {
+      enabled: true,
+      voice: 'es-US-Neural2-B',
+      language: 'es-US',
+      pitch: 0,
+      speakingRate: 1.0,
+      volume: 0.8,
+      effectsProfile: 'small-bluetooth-speaker-class-device'
+    }
   }),
   actions: {
+    // Inicializar configuración del narrador
+    init() {
+      this.loadNarratorConfig();
+    },
+
     async obtenerUbicacion(reload = true) {
       try {
         const pos = await Geolocation.getCurrentPosition();
@@ -58,6 +74,36 @@ export const home = defineStore('home', {
     setMapContainer(element) {
       this.mapContainer = element;
     },
+
+    // Métodos para configuración del narrador
+    loadNarratorConfig() {
+      const savedConfig = localStorage.getItem('narrator-config');
+      if (savedConfig) {
+        this.narratorConfig = { ...this.narratorConfig, ...JSON.parse(savedConfig) };
+      }
+    },
+
+    saveNarratorConfig() {
+      localStorage.setItem('narrator-config', JSON.stringify(this.narratorConfig));
+    },
+
+    updateNarratorConfig(newConfig) {
+      this.narratorConfig = { ...this.narratorConfig, ...newConfig };
+      this.saveNarratorConfig();
+    },
+
+    resetNarratorConfig() {
+      this.narratorConfig = {
+        enabled: true,
+        voice: 'es-US-Neural2-B',
+        language: 'es-US',
+        pitch: 0,
+        speakingRate: 1.0,
+        volume: 0.8,
+        effectsProfile: 'small-bluetooth-speaker-class-device'
+      };
+      this.saveNarratorConfig();
+    }
   },
   getters: {},
 })
