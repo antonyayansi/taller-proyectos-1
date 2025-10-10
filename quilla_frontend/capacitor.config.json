@@ -1,5 +1,11 @@
 {
   "appId": "com.quilla",
   "appName": "quilla",
-  "webDir": "dist"
+  "webDir": "dist",
+
+   "plugins": {
+    "Mapbox": {
+      "accessToken": "pk.eyJ1IjoianVsaW9heW1hMTAwMCIsImEiOiJjbWdpcXNmZWswYnd6MmtvcTEyeTh5dXVpIn0.nYVhc7OvYThti1ciuSxefg"
+    }
+  }
 }

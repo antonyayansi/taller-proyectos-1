@@ -1,13 +1,43 @@
 <!DOCTYPE html>
-<html lang="">
+<html lang="es">
   <head>
-    <meta charset="UTF-8">
-    <link rel="icon" href="/favicon.ico">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vite App</title>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quilla</title>
+
+    <!-- 📍 Leaflet CSS -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+
+    <!-- 🧭 Estilos base -->
+    <style>
+      html,
+      body,
+      #app {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        width: 100%;
+      }
+    </style>
   </head>
   <body>
+    <!-- 📌 Punto de montaje de la app Vue -->
     <div id="app"></div>
+
+    <!-- 📍 Leaflet JS (debe cargarse antes del plugin) -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <!-- 🪣 PouchDB (para cache local de tiles) -->
+    <script src="https://cdn.jsdelivr.net/npm/pouchdb@8.0.1/dist/pouchdb.min.js"></script>
+
+    <!-- 🧭 Plugin cache offline (extiende Leaflet con TileLayer.PouchDBCached) -->
+    <script src="/libs/L.TileLayer.PouchDBCached.js"></script>
+
+    <!-- 🚀 Tu app Vue (compilada con Vite) -->
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>
