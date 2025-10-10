@@ -237,7 +237,8 @@ const route = useRoute()
 
 const {
     sitioActive,
-    getSitiosById
+    getSitiosById,
+    textToSpeech
 } = useSitios()
 
 
