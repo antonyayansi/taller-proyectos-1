@@ -10,14 +10,15 @@ import router from './router'
 
 const app = createApp(App)
 
-app.use(PrimeVue, {
-  theme: {
-    preset: Quilla,
-    options: {
-      darkModeSelector: '.dark',
+app
+  .use(PrimeVue, {
+    theme: {
+      preset: Quilla,
+      options: {
+        darkModeSelector: '.dark',
+      },
     },
-  },
-})
+  })
   .use(router)
   .use(createPinia())
   .mount('#app')
