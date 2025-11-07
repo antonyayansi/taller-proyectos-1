@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { Geolocation } from '@capacitor/geolocation'
 import { addMarker, loadMapa } from '@/services/gps';
+import { Network } from '@capacitor/network';
 
 const initLatLng = { lat: -13.516985, lng: -71.978113 };
 
@@ -36,9 +37,15 @@ export const home = defineStore('home', {
       duration: 0,
       title: '',
       loading: false
-    }
+    },
+    statusNetwork: true,
   }),
   actions: {
+    async checkNetwork() {
+      Network.addListener('networkStatusChange', status => {
+        this.statusNetwork = status;
+      });
+    },
     // Inicializar configuración del narrador
     init() {
       this.loadNarratorConfig();

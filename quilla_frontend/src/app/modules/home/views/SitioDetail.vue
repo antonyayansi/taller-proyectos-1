@@ -42,7 +42,7 @@
                             </h1>
                             <Tag :value="sitioActive.categorias.nombre" severity="info" class="font-medium" />
                         </div>
-                        <Button icon="pi pi-directions" rounded size="large"
+                        <Button @click="initNavigation" icon="pi pi-directions" rounded size="large"
                             class="ml-4 bg-blue-600 hover:bg-blue-700" />
                     </div>
 
@@ -178,7 +178,7 @@ import {
     TabPanel
 } from 'primevue';
 import { onMounted, ref } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import useSitios from '../hooks/useSitios';
 import Rutas from '../components/Rutas.vue';
 import useHome from '../hooks/useHome';
@@ -186,6 +186,7 @@ import usePerfil from '../../profile/hooks/usePerfil';
 import Resenias from '../components/Resenias.vue';
 
 const route = useRoute()
+const router = useRouter()
 const tap = ref('0');
 
 const {
@@ -195,15 +196,21 @@ const {
 } = useSitios()
 
 const {
-    ubicacionActual
+    ubicacionActual,
+    obtenerUbicacion
 } = useHome()
 
 const {
     setFavoritos
 } = usePerfil()
 
+const initNavigation = () => {
+    router.push({ name: 'home.sitio.navigate', params: { id: sitioActive.value.id } })
+}
+
 onMounted(async () => {
     const id = route.params.id;
     await getSitiosById(id)
+    obtenerUbicacion()
 })
 </script>

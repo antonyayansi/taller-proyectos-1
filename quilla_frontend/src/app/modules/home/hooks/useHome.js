@@ -17,6 +17,7 @@ const useHome = () => {
     seekAudio: home().seekAudio,
     setVolume: home().setVolume,
     setLoading: home().setLoading,
+    checkNetwork: home().checkNetwork
   }
 }
 

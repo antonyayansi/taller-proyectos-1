@@ -7,13 +7,19 @@
 import { useDark, useToggle } from '@vueuse/core'
 import useAuth from './app/modules/auth/hooks/useAuth'
 import { Toaster } from 'vue-sonner'
+import useHome from './app/modules/home/hooks/useHome'
 
 const {
     getUser
 } = useAuth()
 
+const {
+    checkNetwork
+} = useHome()
+
 const isDark = useDark()
 const toggleDark = useToggle(isDark.value)
 
 getUser()
+checkNetwork()
 </script>
