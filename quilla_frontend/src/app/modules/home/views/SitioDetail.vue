@@ -32,7 +32,7 @@
             </div>
 
             <!-- Main Info Card -->
-            <div class="mx-4 -mt-8 relative z-10">
+            <div class="mx-4 -mt-2 relative z-10">
                 <div class="bg-white dark:bg-zinc-800 rounded-2xl shadow-xl p-6">
                     <!-- Title and Category -->
                     <div class="flex items-start justify-between mb-4">

@@ -1,7 +1,7 @@
 <template>
     <Transition name="slide-up">
         <div v-if="audioPlayer.audio"
-            class="fixed bottom-4 mx-2 rounded-xl left-0 right-0 z-50 backdrop-blur-xl bg-white/30 dark:bg-zinc-800/30 border-t border-zinc-200 dark:border-zinc-700 shadow-2xl">
+            class="fixed bottom-4 mx-2 rounded-xl left-0 right-0 z-9999 backdrop-blur-xl bg-white/30 dark:bg-zinc-800/30 border-t border-zinc-200 dark:border-zinc-700 shadow-2xl">
             <div class="max-w-screen-lg mx-auto px-4 py-3">
                 <!-- Player Header -->
                 <div class="flex items-center justify-between mb-3">

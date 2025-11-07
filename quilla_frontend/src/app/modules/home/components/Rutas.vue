@@ -12,12 +12,12 @@
                         <span>{{ ruta.duracion }} min</span>
                     </div>
                 </div>
-                <Button @click="textToSpeech(ruta.descripcion, ruta.titulo)" icon="pi pi-volume-up" rounded text
-                    severity="secondary" size="small" v-tooltip.top="'Escuchar descripción'" />
+                <Button @click="textToSpeech(ruta.descripcion, ruta.titulo, true, ruta.id)" icon="pi pi-volume-up"
+                    rounded text severity="secondary" size="small" v-tooltip.top="'Escuchar descripción'" />
             </div>
-            <p v-if="ruta.descripcion" class="text-zinc-700 dark:text-zinc-300 text-sm leading-relaxed">
+            <!-- <p v-if="ruta.descripcion" class="text-zinc-700 dark:text-zinc-300 text-sm leading-relaxed">
                 {{ ruta.descripcion }}
-            </p>
+            </p> -->
         </div>
     </div>
     <div v-else class="text-center py-12">

@@ -8,7 +8,11 @@ const usePerfil = () => {
         ...storePerfil,
         getFavoritos: perfil().getFavoritos,
         setFavoritos: perfil().setFavoritos,
-        removeFavoritos: perfil().removeFavoritos
+        removeFavoritos: perfil().removeFavoritos,
+        listarAudiosGuardados: perfil().listarAudiosGuardados,
+        reproducirAudio: perfil().reproducirAudio,
+        eliminarAudio: perfil().eliminarAudio,
+        eliminarTodosLosAudios: perfil().eliminarTodosLosAudios
     }
 }
 

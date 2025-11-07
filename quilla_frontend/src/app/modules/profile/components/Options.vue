@@ -14,6 +14,12 @@
                     <i class="pi pi-chevron-right"></i>
                 </div>
             </li>
+            <li @click="onOpenDrawer('Audios')">
+                <div class="flex justify-between items-center">
+                    <span><i class="pi pi-headphones"></i> Mis audios guardados</span>
+                    <i class="pi pi-chevron-right"></i>
+                </div>
+            </li>
             <li @click="onOpenDrawer('Narrador')">
                 <div class="flex justify-between items-center">
                     <span><i class="pi pi-comment"></i> Narrador</span>
@@ -36,6 +42,7 @@
     </div>
     <Drawer v-model:visible="openDrawer" :header="optionSelected" position="bottom"
         style="height: 80vh; min-height: auto;" :dismissable-mask="true">
+        <Audios v-if="optionSelected === 'Audios'" />
         <Favoritos v-if="optionSelected === 'Favoritos'" />
         <NarratorConfig v-if="optionSelected === 'Narrador'" />
     </Drawer>
@@ -51,6 +58,7 @@ import useAuth from '../../auth/hooks/useAuth';
 import { ref } from 'vue';
 import NarratorConfig from './NarratorConfig.vue';
 import Favoritos from './Favoritos.vue';
+import Audios from './Audios.vue';
 
 const isDark = useDark()
 const openDrawer = ref(false)

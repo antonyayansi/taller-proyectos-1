@@ -25,10 +25,15 @@ import {
 import useAuth from '../../auth/hooks/useAuth';
 import { supabase } from '@/services/supabase/supabase';
 import Options from '../components/Options.vue';
+import usePerfil from '../hooks/usePerfil';
 
 const {
     user
 } = useAuth()
+
+const {
+    listarAudiosGuardados
+} = usePerfil()
 
 const loginWithGoogle = async () => {
     await supabase.auth.signInWithOAuth({
@@ -38,4 +43,6 @@ const loginWithGoogle = async () => {
         },
     })
 }
+
+listarAudiosGuardados()
 </script>

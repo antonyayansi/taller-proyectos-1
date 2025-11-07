@@ -1,4 +1,5 @@
 import { addMarker, calculateDistance } from "@/services/gps";
+import { Filesystem, Directory } from '@capacitor/filesystem';
 import { supabase } from "@/services/supabase/supabase";
 import { defineStore } from "pinia";
 import useHome from "../hooks/useHome";
@@ -113,7 +114,7 @@ export const sitios = defineStore("sitios", {
                 sitio.descripcion.toLowerCase().includes(lowerQuery)
             );
         },
-        async textToSpeech(text, title = '') {
+        async textToSpeech(text, title = '', saveToFile = false, IDUnico = '') {
             // Cargar configuración del narrador
             homeStore.loadNarratorConfig();
             const config = homeStore.narratorConfig;
@@ -121,6 +122,41 @@ export const sitios = defineStore("sitios", {
             // Si el narrador está desactivado, no hacer nada
             if (!config.enabled) {
                 return;
+            }
+
+            // Si viene IDUnico, buscar si ya existe el audio guardado
+            if (IDUnico) {
+                try {
+                    const result = await Filesystem.readdir({
+                        path: '',
+                        directory: Directory.Data,
+                    });
+
+                    // Buscar archivo que contenga el IDUnico en el nombre
+                    const audioExistente = result.files.find(file => file.name.split(' - ')[0] == IDUnico);
+
+                    if (audioExistente) {
+                        // Leer el archivo existente
+                        const fileResult = await Filesystem.readFile({
+                            path: audioExistente.name,
+                            directory: Directory.Data,
+                        });
+
+                        // Decodificar base64 a blob
+                        const audioBlob = new Blob(
+                            [Uint8Array.from(atob(fileResult.data), c => c.charCodeAt(0))],
+                            { type: 'audio/mp3' }
+                        );
+
+                        // Reproducir el audio existente
+                        homeStore.playAudio(audioBlob, title);
+
+                        return audioExistente.uri; // Devolver la ruta del archivo existente
+                    }
+                } catch (error) {
+                    console.log('⚠️ No se encontró audio en cache, generando nuevo:', error.message);
+                    // Continuar con la generación normal si no se encuentra
+                }
             }
 
             // Indicar que está cargando
@@ -172,6 +208,21 @@ export const sitios = defineStore("sitios", {
 
                 // Usar el reproductor global
                 homeStore.playAudio(audioBlob, title);
+
+                let filePath = null;
+
+                if (saveToFile) {
+                    const fileName = `${IDUnico} - ${title || 'tts_audio'}_${Date.now()}.mp3`;
+                    const saveResult = await Filesystem.writeFile({
+                        path: fileName,
+                        data: audioBytes, // base64
+                        directory: Directory.Data,
+                    });
+                    filePath = saveResult.uri;
+                    console.log('✅ Audio guardado en:', filePath);
+                }
+
+                return filePath; // <- 🔁 devuelve la ruta si se guardó
             } catch (error) {
                 console.error('Error en textToSpeech:', error);
             } finally {
