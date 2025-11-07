@@ -24,6 +24,16 @@ export const home = defineStore('home', {
       speakingRate: 1.0,
       volume: 0.8,
       effectsProfile: 'small-bluetooth-speaker-class-device'
+    },
+
+    // Reproductor de audio global
+    audioPlayer: {
+      audio: null,
+      isPlaying: false,
+      currentTime: 0,
+      duration: 0,
+      title: '',
+      loading: false
     }
   }),
   actions: {
@@ -103,6 +113,84 @@ export const home = defineStore('home', {
         effectsProfile: 'small-bluetooth-speaker-class-device'
       };
       this.saveNarratorConfig();
+    },
+
+    // Métodos del reproductor de audio
+    playAudio(audioBlob, title = '') {
+      // Detener audio anterior si existe
+      this.stopAudio();
+
+      // Crear nuevo audio
+      const audioUrl = URL.createObjectURL(audioBlob);
+      this.audioPlayer.audio = new Audio(audioUrl);
+      this.audioPlayer.audio.volume = this.narratorConfig.volume;
+      this.audioPlayer.title = title;
+
+      // Event listeners
+      this.audioPlayer.audio.addEventListener('loadedmetadata', () => {
+        this.audioPlayer.duration = this.audioPlayer.audio.duration;
+      });
+
+      this.audioPlayer.audio.addEventListener('timeupdate', () => {
+        this.audioPlayer.currentTime = this.audioPlayer.audio?.currentTime;
+      });
+
+      this.audioPlayer.audio.addEventListener('ended', () => {
+        this.audioPlayer.isPlaying = false;
+        this.audioPlayer.currentTime = 0;
+      });
+
+      this.audioPlayer.audio.addEventListener('play', () => {
+        this.audioPlayer.isPlaying = true;
+      });
+
+      this.audioPlayer.audio.addEventListener('pause', () => {
+        this.audioPlayer.isPlaying = false;
+      });
+
+      // Reproducir
+      this.audioPlayer.audio.play();
+      this.audioPlayer.isPlaying = true;
+    },
+
+    togglePlayPause() {
+      if (!this.audioPlayer.audio) return;
+
+      if (this.audioPlayer.isPlaying) {
+        this.audioPlayer.audio.pause();
+      } else {
+        this.audioPlayer.audio.play();
+      }
+    },
+
+    stopAudio() {
+      if (this.audioPlayer.audio) {
+        this.audioPlayer.audio.pause();
+        this.audioPlayer.audio.currentTime = 0;
+        this.audioPlayer.audio = null;
+        this.audioPlayer.isPlaying = false;
+        this.audioPlayer.currentTime = 0;
+        this.audioPlayer.duration = 0;
+        this.audioPlayer.title = '';
+      }
+    },
+
+    seekAudio(time) {
+      if (this.audioPlayer.audio && isFinite(time) && !isNaN(time) && time >= 0) {
+        this.audioPlayer.audio.currentTime = time;
+      }
+    },
+
+    setVolume(volume) {
+      if (this.audioPlayer.audio) {
+        this.audioPlayer.audio.volume = volume;
+      }
+      this.narratorConfig.volume = volume;
+      this.saveNarratorConfig();
+    },
+
+    setLoading(loading) {
+      this.audioPlayer.loading = loading;
     }
   },
   getters: {},

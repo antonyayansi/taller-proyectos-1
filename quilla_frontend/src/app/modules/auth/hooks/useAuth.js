@@ -7,6 +7,7 @@ const useAuth = () => {
     return {
         ...storeAuth,
         getUser: auth().getUser,
+        logout: auth().logout,
     }
 }
 

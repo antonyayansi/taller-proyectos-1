@@ -7,9 +7,11 @@
             <RouterView />
         </main>
         <Menu />
+        <AudioPlayer />
     </div>
 </template>
 
 <script setup>
 import Menu from '../components/Menu.vue';
+import AudioPlayer from '../components/AudioPlayer.vue';
 </script>

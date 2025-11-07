@@ -9,6 +9,12 @@ const useHome = () => {
     obtenerUbicacion: home().obtenerUbicacion,
     getMapa: home().getMapa,
     setMapContainer: home().setMapContainer,
+    playAudio: home().playAudio,
+    togglePlayPause: home().togglePlayPause,
+    stopAudio: home().stopAudio,
+    seekAudio: home().seekAudio,
+    setVolume: home().setVolume,
+    setLoading: home().setLoading,
   }
 }
 

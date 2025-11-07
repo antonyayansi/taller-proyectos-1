@@ -1,3 +1,4 @@
+import { supabase } from "@/services/supabase/supabase";
 import { defineStore } from "pinia";
 
 export const auth = defineStore("auth", {
@@ -5,11 +6,16 @@ export const auth = defineStore("auth", {
         user: null,
     }),
     actions: {
-        getUser() {
-            const userData = localStorage.getItem(`sb-${import.meta.env.VITE_SUPABASE_KEY}-auth-token`);
-            if (userData) {
-                this.user = JSON.parse(userData)?.user;
-            }
+        async getUser() {
+            const {
+                data: { user },
+            } = await supabase.auth.getUser()
+            this.user = user;
         },
+        async logout() {
+            this.user = null;
+            const { error } = await supabase.auth.signOut()
+            localStorage.removeItem(`sb-${import.meta.env.VITE_SUPABASE_KEY}-auth-token`);
+        }
     },
 });

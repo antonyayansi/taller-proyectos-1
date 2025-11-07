@@ -54,18 +54,9 @@ export const sitios = defineStore("sitios", {
                     .from('sitios')
                     .select(`
                         *,
-                        categorias:categoria_id (
-                            *
-                        ),
-                        imagenes_sitio (
-                            *
-                        ),
-                        rutas (
-                            *,
-                            audios (
-                                *
-                            )
-                        )
+                        categorias:categorias_id(nombre),
+                        rutas (*),
+                        imagenes_sitio (*)
                     `)
                     .eq('id', id)
                     .single();
@@ -87,7 +78,7 @@ export const sitios = defineStore("sitios", {
                     ...data,
                     distancia: distancia.toFixed(2)
                 };
-                await this.textToSpeech(this.sitioActive.descripcion);
+                // await this.textToSpeech(this.sitioActive.descripcion);
                 return this.sitioActive;
             } catch (e) {
                 console.error('Error fetching sitio by id:', e);
@@ -122,7 +113,7 @@ export const sitios = defineStore("sitios", {
                 sitio.descripcion.toLowerCase().includes(lowerQuery)
             );
         },
-        async textToSpeech(text) {
+        async textToSpeech(text, title = '') {
             // Cargar configuración del narrador
             homeStore.loadNarratorConfig();
             const config = homeStore.narratorConfig;
@@ -131,6 +122,9 @@ export const sitios = defineStore("sitios", {
             if (!config.enabled) {
                 return;
             }
+
+            // Indicar que está cargando
+            homeStore.setLoading(true);
 
             let text_sub = text;
 
@@ -170,17 +164,18 @@ export const sitios = defineStore("sitios", {
 
                 const result = await response.json();
 
-                // Decodificar el audio base64 y reproducirlo
+                // Decodificar el audio base64 y crear Blob
                 const audioBytes = result.audioContent;
                 const audioBlob = new Blob([Uint8Array.from(atob(audioBytes), c => c.charCodeAt(0))], {
                     type: 'audio/mp3'
                 });
 
-                const audio = new Audio(URL.createObjectURL(audioBlob));
-                audio.volume = config.volume;
-                audio.play();
+                // Usar el reproductor global
+                homeStore.playAudio(audioBlob, title);
             } catch (error) {
                 console.error('Error en textToSpeech:', error);
+            } finally {
+                homeStore.setLoading(false);
             }
         }
     },
