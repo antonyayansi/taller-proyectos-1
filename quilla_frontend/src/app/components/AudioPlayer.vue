@@ -1,7 +1,25 @@
 <template>
+    <!-- Mini Player (Minimizado) -->
+    <Transition name="fade">
+        <div v-if="audioPlayer.audio && isMinimized" @click="toggleMinimize"
+            class="fixed bottom-24 right-4 z-9999 cursor-pointer group">
+            <div
+                class="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 shadow-lg flex items-center justify-center hover:scale-110 transition-transform">
+                <i :class="audioPlayer.isPlaying ? 'pi pi-pause' : 'pi pi-play'"
+                    class="text-white text-2xl animate-pulse"></i>
+            </div>
+            <!-- Tooltip -->
+            <div
+                class="absolute bottom-full right-0 mb-2 px-3 py-1 bg-zinc-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                {{ audioPlayer.title || 'Reproduciendo audio' }}
+            </div>
+        </div>
+    </Transition>
+
+    <!-- Full Player (Expandido) -->
     <Transition name="slide-up">
-        <div v-if="audioPlayer.audio"
-            class="fixed bottom-4 mx-2 rounded-xl left-0 right-0 z-9999 backdrop-blur-xl bg-white/30 dark:bg-zinc-800/30 border-t border-zinc-200 dark:border-zinc-700 shadow-2xl">
+        <div v-if="audioPlayer.audio && !isMinimized"
+            class="fixed bottom-22 mx-2 rounded-xl left-0 right-0 z-9999 backdrop-blur-xl bg-white/30 dark:bg-zinc-800/30 border-t border-zinc-200 dark:border-zinc-700">
             <div class="max-w-screen-lg mx-auto px-4 py-3">
                 <!-- Player Header -->
                 <div class="flex items-center justify-between mb-3">
@@ -19,8 +37,12 @@
                             </p>
                         </div>
                     </div>
-                    <Button @click="stopAudio" icon="pi pi-times" text rounded severity="secondary"
-                        class="flex-shrink-0" />
+                    <div class="flex items-center gap-2 flex-shrink-0">
+                        <Button @click="toggleMinimize" icon="pi pi-minus" text rounded severity="secondary"
+                            v-tooltip.top="'Minimizar'" />
+                        <Button @click="stopAudio" icon="pi pi-times" text rounded severity="secondary"
+                            v-tooltip.top="'Cerrar'" />
+                    </div>
                 </div>
 
                 <!-- Progress Bar -->
@@ -72,6 +94,11 @@ const {
 } = useHome();
 
 const currentTime = ref(0);
+const isMinimized = ref(false);
+
+const toggleMinimize = () => {
+    isMinimized.value = !isMinimized.value;
+};
 
 // Sincronizar currentTime con el reproductor
 watch(() => audioPlayer.value.currentTime, (newVal) => {
@@ -84,6 +111,7 @@ watch(() => audioPlayer.value.currentTime, (newVal) => {
 watch(() => audioPlayer.value.audio, (newAudio) => {
     if (!newAudio) {
         currentTime.value = 0;
+        isMinimized.value = false; // Resetear minimizado cuando se cierra
     }
 });
 
@@ -127,6 +155,21 @@ const onVolumeChange = (value) => {
 .slide-up-enter-to,
 .slide-up-leave-from {
     transform: translateY(0);
+    opacity: 1;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
+}
+
+.fade-enter-to,
+.fade-leave-from {
     opacity: 1;
 }
 </style>

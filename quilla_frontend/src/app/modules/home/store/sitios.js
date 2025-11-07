@@ -5,6 +5,7 @@ import { defineStore } from "pinia";
 import useHome from "../hooks/useHome";
 import { home } from "./home";
 import useAuth from "../../auth/hooks/useAuth";
+import { toast } from "vue-sonner";
 
 const {
     ubicacionActual
@@ -235,12 +236,12 @@ export const sitios = defineStore("sitios", {
                         directory: Directory.Data,
                     });
                     filePath = saveResult.uri;
-                    console.log('✅ Audio guardado en:', filePath);
+                    toast.success('Audio guardado correctamente');
                 }
 
-                return filePath; // <- 🔁 devuelve la ruta si se guardó
+                return filePath;
             } catch (error) {
-                console.error('Error en textToSpeech:', error);
+                toast.error('Error al generar audio: ' + error.message);
             } finally {
                 homeStore.setLoading(false);
             }

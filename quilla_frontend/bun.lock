@@ -24,6 +24,7 @@
         "tailwindcss": "^4.1.13",
         "vue": "^3.5.18",
         "vue-router": "^4.5.1",
+        "vue-sonner": "^2.0.9",
         "vue3-google-map": "^0.24.1",
       },
       "devDependencies": {
@@ -704,6 +705,8 @@
     "vue": ["vue@3.5.21", "", { "dependencies": { "@vue/compiler-dom": "3.5.21", "@vue/compiler-sfc": "3.5.21", "@vue/runtime-dom": "3.5.21", "@vue/server-renderer": "3.5.21", "@vue/shared": "3.5.21" }, "peerDependencies": { "typescript": "*" }, "optionalPeers": ["typescript"] }, "sha512-xxf9rum9KtOdwdRkiApWL+9hZEMWE90FHh8yS1+KJAiWYh+iGWV1FquPjoO9VUHQ+VIhsCXNNyZ5Sf4++RVZBA=="],
 
     "vue-router": ["vue-router@4.5.1", "", { "dependencies": { "@vue/devtools-api": "^6.6.4" }, "peerDependencies": { "vue": "^3.2.0" } }, "sha512-ogAF3P97NPm8fJsE4by9dwSYtDwXIY1nFY9T6DyQnGHd1E2Da94w9JIolpe42LJGIl0DwOHBi8TcRPlPGwbTtw=="],
+
+    "vue-sonner": ["vue-sonner@2.0.9", "", { "peerDependencies": { "@nuxt/kit": "^4.0.3", "@nuxt/schema": "^4.0.3", "nuxt": "^4.0.3" }, "optionalPeers": ["@nuxt/kit", "@nuxt/schema", "nuxt"] }, "sha512-i6BokNlNDL93fpzNxN/LZSn6D6MzlO+i3qXt6iVZne3x1k7R46d5HlFB4P8tYydhgqOrRbIZEsnRd3kG7qGXyw=="],
 
     "vue3-google-map": ["vue3-google-map@0.24.1", "", { "dependencies": { "@googlemaps/js-api-loader": "^1.16.2", "@googlemaps/markerclusterer": "^2.4.0", "fast-deep-equal": "^3.1.3" }, "peerDependencies": { "vue": "^3" } }, "sha512-3v96LJ+2+Fwlp5OXA26Kw0ogkiP6kc1vW/V8IpW13ju2LgFbxkIIvZeb8fJ7WgMRDtncbLuZLOU1zwiyWcnifw=="],
 

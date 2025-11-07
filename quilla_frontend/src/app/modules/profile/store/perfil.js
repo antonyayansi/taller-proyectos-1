@@ -3,6 +3,7 @@ import useAuth from "../../auth/hooks/useAuth";
 import { defineStore } from "pinia";
 import { Directory, Filesystem } from "@capacitor/filesystem";
 import useHome from "../../home/hooks/useHome";
+import { toast } from "vue-sonner";
 
 const {
     user
@@ -46,6 +47,7 @@ export const perfil = defineStore("perfil", {
                     users_id: user.value.id,
                     sitios_id: sitios_id
                 })
+                toast.success('Sitio añadido a favoritos');
             } catch (e) {
                 console.error('Error adding favorito:', e);
             }
@@ -58,6 +60,7 @@ export const perfil = defineStore("perfil", {
                     .eq('users_id', user.value.id)
                     .eq('sitios_id', sitios_id)
                 await this.getFavoritos();
+                toast.success('Sitio eliminado de favoritos');
             } catch (e) {
                 console.error('Error removing favorito:', e);
             }

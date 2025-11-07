@@ -1,7 +1,7 @@
 <template>
     <!-- <Button label="modo noche" @click="toggleLight" /> -->
     <div class="px-4 py-6 bg-zinc-50 dark:bg-zinc-900 min-h-screen">
-        <InputText class="" placeholder="Buscar..." fluid="" />
+        <InputText @keyup="searchSitios($event.target.value)" class="" placeholder="Buscar..." fluid="" />
         <div class="my-4">
             <div class="flex items-center justify-between space-x-2">
                 <label class="font-light text-sm">Tu ubicación actual</label>

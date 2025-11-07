@@ -10,6 +10,7 @@ import router from './router'
 
 import './assets/main.css'
 import 'primeicons/primeicons.css'
+import 'vue-sonner/style.css'
 
 const app = createApp(App)
 
