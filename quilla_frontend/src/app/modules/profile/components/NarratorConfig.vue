@@ -1,6 +1,6 @@
 <template>
-    <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-md dark:shadow-zinc-900/30 p-6 mb-6  ">
-        <div class="flex items-center justify-between mb-6">
+    <div>
+        <!-- <div class="flex items-center justify-between mb-6">
             <h2 class="text-xl font-bold text-zinc-800 dark:text-white flex items-center">
                 Configuración del Narrador
             </h2>
@@ -13,7 +13,7 @@
                     {{ localConfig.enabled ? 'Activado' : 'Desactivado' }}
                 </span>
             </label>
-        </div>
+        </div> -->
 
         <div v-if="localConfig.enabled" class="space-y-6">
             <!-- Idioma y Voz -->
@@ -109,34 +109,21 @@
 
             <!-- Botones de Prueba y Reset -->
             <div class="flex flex-col sm:flex-row gap-3 pt-4 border-t border-zinc-200 dark:border-zinc-600">
-                <button @click="testVoice" :disabled="isTesting"
-                    class="flex-1 bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 disabled:bg-green-400 dark:disabled:bg-green-400 text-white font-semibold py-2 px-4 rounded-md transition duration-200 flex items-center justify-center">
-                    <svg v-if="!isTesting" class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
-                        </path>
-                    </svg>
-                    <div v-else
-                        class="w-4 h-4 mr-2 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    {{ isTesting ? 'Probando...' : 'Probar Voz' }}
-                </button>
-
-                <button @click="resetConfig"
-                    class="flex-1 bg-zinc-600 hover:bg-zinc-700 dark:bg-zinc-500 dark:hover:bg-zinc-600 text-white font-semibold py-2 px-4 rounded-md transition duration-200 flex items-center justify-center">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
-                        </path>
-                    </svg>
-                    Restablecer
-                </button>
+                <Button :label="isTesting ? 'Probando...' : 'Probar Voz'"
+                    :icon="isTesting ? 'pi pi-spin pi-spinner' : 'pi pi-play'" :disabled="isTesting" class="flex-1"
+                    severity="success" @click="testVoice" />
+                <Button label="Restablecer" severity="secondary" icon="pi pi-refresh" class="flex-1"
+                    @click="resetConfig" />
             </div>
         </div>
     </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import {
+    Button
+} from 'primevue';
+import { ref, computed, onMounted } from 'vue'
 import { home } from '@/app/modules/home/store/home'
 
 const homeStore = home()

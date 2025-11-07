@@ -8,7 +8,13 @@
                     <ToggleSwitch v-model="isDark" />
                 </div>
             </li>
-            <li>
+            <li @click="onOpenDrawer('Favoritos')">
+                <div class="flex justify-between items-center">
+                    <span><i class="pi pi-heart"></i> Mis favoritos</span>
+                    <i class="pi pi-chevron-right"></i>
+                </div>
+            </li>
+            <li @click="onOpenDrawer('Narrador')">
                 <div class="flex justify-between items-center">
                     <span><i class="pi pi-comment"></i> Narrador</span>
                     <i class="pi pi-chevron-right"></i>
@@ -28,19 +34,35 @@
             </li>
         </ul>
     </div>
+    <Drawer v-model:visible="openDrawer" :header="optionSelected" position="bottom"
+        style="height: 80vh; min-height: auto;" :dismissable-mask="true">
+        <Favoritos v-if="optionSelected === 'Favoritos'" />
+        <NarratorConfig v-if="optionSelected === 'Narrador'" />
+    </Drawer>
 </template>
 
 <script setup>
 import { useDark } from '@vueuse/core';
 import {
-    ToggleSwitch
+    ToggleSwitch,
+    Drawer
 } from 'primevue';
 import useAuth from '../../auth/hooks/useAuth';
+import { ref } from 'vue';
+import NarratorConfig from './NarratorConfig.vue';
+import Favoritos from './Favoritos.vue';
 
 const isDark = useDark()
+const openDrawer = ref(false)
+const optionSelected = ref(null)
 
 const {
     logout
 } = useAuth()
+
+const onOpenDrawer = (option) => {
+    optionSelected.value = option
+    openDrawer.value = true
+}
 
 </script>

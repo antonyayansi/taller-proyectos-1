@@ -9,7 +9,7 @@
                 <div class="flex gap-2">
                     <Button icon="pi pi-share-alt" rounded text severity="secondary"
                         class="hover:bg-zinc-100 dark:hover:bg-zinc-800" />
-                    <Button icon="pi pi-heart" rounded text severity="secondary"
+                    <Button @click="setFavoritos(sitioActive.id)" icon="pi pi-heart" rounded text severity="secondary"
                         class="hover:bg-zinc-100 dark:hover:bg-zinc-800" />
                 </div>
             </div>
@@ -186,7 +186,7 @@ import { useRoute } from 'vue-router';
 import useSitios from '../hooks/useSitios';
 import Rutas from '../components/Rutas.vue';
 import useHome from '../hooks/useHome';
-
+import usePerfil from '../../profile/hooks/usePerfil';
 
 const route = useRoute()
 
@@ -199,6 +199,10 @@ const {
 const {
     ubicacionActual
 } = useHome()
+
+const {
+    setFavoritos
+} = usePerfil()
 
 onMounted(async () => {
     const id = route.params.id;
