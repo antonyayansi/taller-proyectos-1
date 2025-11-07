@@ -32,7 +32,7 @@
                             </p>
                             <div class="mt-4 flex items-center justify-between">
                                 <Button label="Ver más" size="small" severity="primary" variant="text" />
-                                <Button icon="pi pi-heart" size="small" severity="secondary" />
+                                <!-- <Button icon="pi pi-heart" size="small" severity="secondary" /> -->
                             </div>
                         </div>
                     </div>
@@ -53,7 +53,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, onBeforeUnmount, ref } from 'vue'
 import useHome from '../hooks/useHome';
 import useSitios from '../hooks/useSitios';
 import {
@@ -66,6 +66,8 @@ const mapContainer = ref(null);
 const {
     obtenerUbicacion,
     setMapContainer,
+    startWatchingPosition,
+    stopWatchingPosition,
 } = useHome()
 
 const {
@@ -79,7 +81,13 @@ onMounted(async () => {
     // Set the map container element
     setMapContainer(mapContainer.value);
 
-    await obtenerUbicacion()
+    // Iniciar seguimiento en tiempo real de la ubicación
+    await startWatchingPosition()
     await getSitios()
+})
+
+// Detener el seguimiento cuando el componente se desmonte
+onBeforeUnmount(async () => {
+    await stopWatchingPosition()
 })
 </script>

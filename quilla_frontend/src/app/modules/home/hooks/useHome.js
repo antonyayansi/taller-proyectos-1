@@ -7,6 +7,8 @@ const useHome = () => {
   return {
     ...storeHome,
     obtenerUbicacion: home().obtenerUbicacion,
+    startWatchingPosition: home().startWatchingPosition,
+    stopWatchingPosition: home().stopWatchingPosition,
     getMapa: home().getMapa,
     setMapContainer: home().setMapContainer,
     playAudio: home().playAudio,

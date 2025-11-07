@@ -56,7 +56,7 @@
 
                     <!-- Heart Icon -->
                     <div class="absolute top-4 right-4">
-                        <div
+                        <div @click.stop="removeFavoritos(sitio.id)"
                             class="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center">
                             <i class="pi pi-heart-fill text-red-500 text-lg"></i>
                         </div>
@@ -132,7 +132,8 @@ const loading = ref(true);
 
 const {
     favoritos,
-    getFavoritos
+    getFavoritos,
+    removeFavoritos
 } = usePerfil();
 
 const init = async () => {

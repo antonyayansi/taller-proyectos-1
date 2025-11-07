@@ -8,6 +8,7 @@ const usePerfil = () => {
         ...storePerfil,
         getFavoritos: perfil().getFavoritos,
         setFavoritos: perfil().setFavoritos,
+        removeFavoritos: perfil().removeFavoritos
     }
 }
 

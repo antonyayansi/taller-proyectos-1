@@ -14,6 +14,8 @@ export const home = defineStore('home', {
     mapContainer: null, // HTML element container
     map: null, // Google Maps instance
     isMapLoaded: false, // Flag para saber si el mapa está completamente cargado
+    watchId: null, // ID del watcher de ubicación en tiempo real
+    currentMarker: null, // Marcador de la ubicación actual
 
     // Configuración del narrador
     narratorConfig: {
@@ -54,6 +56,70 @@ export const home = defineStore('home', {
         this.error = error
       }
     },
+
+    // Iniciar seguimiento en tiempo real de la ubicación
+    async startWatchingPosition() {
+      try {
+        // Si ya hay un watcher activo, detenerlo primero
+        if (this.watchId !== null) {
+          await this.stopWatchingPosition();
+        }
+
+        // Obtener ubicación inicial
+        await this.obtenerUbicacion(true);
+
+        // Iniciar seguimiento en tiempo real
+        this.watchId = await Geolocation.watchPosition(
+          {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 0
+          },
+          (position, err) => {
+            if (err) {
+              console.error('Error en watchPosition:', err);
+              this.error = err;
+              return;
+            }
+
+            if (position) {
+              // Actualizar ubicación actual
+              this.ubicacionActual.lat = position.coords.latitude;
+              this.ubicacionActual.lng = position.coords.longitude;
+
+              // Actualizar marcador en el mapa si existe
+              if (this.currentMarker && this.map) {
+                this.currentMarker.position = {
+                  lat: position.coords.latitude,
+                  lng: position.coords.longitude
+                };
+
+                // Centrar el mapa en la nueva posición (opcional, puedes comentar esto si no quieres que se centre automáticamente)
+                this.map.panTo({
+                  lat: position.coords.latitude,
+                  lng: position.coords.longitude
+                });
+              }
+            }
+          }
+        );
+
+        console.log('Seguimiento de ubicación iniciado con ID:', this.watchId);
+      } catch (error) {
+        console.error('Error al iniciar seguimiento de ubicación:', error);
+        this.error = error;
+      }
+    },
+
+    // Detener seguimiento de ubicación
+    async stopWatchingPosition() {
+      if (this.watchId !== null) {
+        await Geolocation.clearWatch({ id: this.watchId });
+        this.watchId = null;
+        console.log('Seguimiento de ubicación detenido');
+      }
+    },
+
     async getMapa() {
       if (!this.mapContainer) {
         console.warn('Map container not set. Call setMapContainer first.');
@@ -70,9 +136,11 @@ export const home = defineStore('home', {
             false
           );
           this.map = data.map;
+          this.currentMarker = data.marker; // Guardar referencia al marcador
         } else {
           const data = await loadMapa(this.mapContainer, initLatLng, 'location', false, this.getNewLatLng);
           this.map = data.map;
+          this.currentMarker = data.marker; // Guardar referencia al marcador
         }
 
         // Marcar el mapa como cargado

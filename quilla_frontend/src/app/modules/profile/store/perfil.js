@@ -42,6 +42,18 @@ export const perfil = defineStore("perfil", {
             } catch (e) {
                 console.error('Error adding favorito:', e);
             }
+        },
+        async removeFavoritos(sitios_id) {
+            if (!user.value) return;
+            try {
+                await supabase.from('favoritos')
+                    .delete()
+                    .eq('users_id', user.value.id)
+                    .eq('sitios_id', sitios_id)
+                await this.getFavoritos();
+            } catch (e) {
+                console.error('Error removing favorito:', e);
+            }
         }
     },
 });
