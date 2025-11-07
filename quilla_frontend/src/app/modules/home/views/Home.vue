@@ -1,9 +1,7 @@
 <template>
     <!-- <Button label="modo noche" @click="toggleLight" /> -->
     <div class="px-4 py-6 bg-zinc-50 dark:bg-zinc-900 min-h-screen">
-        <input @keyup="searchSitios($event.target.value)"
-            class="bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-lg shadow-sm w-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="Buscar..." />
+        <InputText class="" placeholder="Buscar..." fluid="" />
         <div class="my-4">
             <div class="flex items-center justify-between space-x-2">
                 <label class="font-light text-sm">Tu ubicación actual</label>
@@ -67,6 +65,7 @@
 import { onMounted, ref } from 'vue'
 import useHome from '../hooks/useHome';
 import useSitios from '../hooks/useSitios';
+import { InputText } from 'primevue';
 
 const mapContainer = ref(null);
 

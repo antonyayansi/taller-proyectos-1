@@ -82,8 +82,6 @@ export const loadMapa = async (contentHTML, latlng = initLatLng, iconType = 'loc
 
 // Función para agregar marcadores adicionales al mapa
 export const addMarker = async (latlng, iconType = 'location', title = 'Ubicacion', draggable = false, htmlContent = null) => {
-
-    console.log(iconType)
     const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
 
     // Crear contenido personalizado del marcador
