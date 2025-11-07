@@ -1,5 +1,20 @@
 {
   "appId": "com.quilla",
   "appName": "quilla",
-  "webDir": "dist"
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "https"
+  },
+  "plugins": {
+    "App": {
+      "urlScheme": "quilla",
+      "deepLinks": [
+        {
+          "scheme": "quilla",
+          "host": "auth",
+          "path": "/callback"
+        }
+      ]
+    }
+  }
 }

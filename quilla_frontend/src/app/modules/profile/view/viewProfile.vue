@@ -27,6 +27,8 @@ import { supabase } from '@/services/supabase/supabase';
 import Options from '../components/Options.vue';
 import usePerfil from '../hooks/usePerfil';
 
+const hostname = window.location.hostname
+
 const {
     user
 } = useAuth()
