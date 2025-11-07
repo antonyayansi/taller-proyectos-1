@@ -4,10 +4,15 @@ import { supabase } from "@/services/supabase/supabase";
 import { defineStore } from "pinia";
 import useHome from "../hooks/useHome";
 import { home } from "./home";
+import useAuth from "../../auth/hooks/useAuth";
 
 const {
     ubicacionActual
 } = useHome()
+
+const {
+    user
+} = useAuth()
 
 const homeStore = home()
 
@@ -15,7 +20,18 @@ export const sitios = defineStore("sitios", {
     state: () => ({
         sitios: [],
         sitiosbk: [],
-        sitioActive: null
+        sitioActive: null,
+        resenias: [],
+        loadingResenias: false,
+        openNewReseniaModal: false,
+        new_resenia: {
+            users_id: null,
+            name: '',
+            avatar: '',
+            sitios_id: null,
+            calificacion: 1,
+            comentario: ''
+        }
     }),
     actions: {
         async getSitios() {
@@ -165,7 +181,7 @@ export const sitios = defineStore("sitios", {
             let text_sub = text;
 
             try {
-                const apiKey = "AIzaSyClgb1ViE6cjIMaDTobCLHxUcJk6AutcLk";
+                const apiKey = import.meta.env.VITE_GOOGLE_MAPS_KEY;
                 const endpoint = `https://texttospeech.googleapis.com/v1beta1/text:synthesize?key=${apiKey}`;
 
                 const payload = {
@@ -227,6 +243,50 @@ export const sitios = defineStore("sitios", {
                 console.error('Error en textToSpeech:', error);
             } finally {
                 homeStore.setLoading(false);
+            }
+        },
+        async getReseniasBySitioId(sitioId) {
+            this.loadingResenias = true;
+            try {
+                const { data, error } = await supabase
+                    .from('resenias')
+                    .select(`
+                        *
+                    `)
+                    .eq('sitios_id', sitioId)
+                    .order('created_at', { ascending: false });
+                if (error) throw error;
+
+                this.resenias = data;
+            } catch (e) {
+                console.error('Error fetching resenias:', e);
+            } finally {
+                this.loadingResenias = false;
+            }
+        },
+        async addNewResenia() {
+            try {
+                this.new_resenia.sitios_id = this.sitioActive.id;
+                this.new_resenia.users_id = user.value.id;
+                this.new_resenia.name = user.value?.user_metadata.name;
+                this.new_resenia.avatar = user.value?.user_metadata.avatar_url;
+
+                const { data, error } = await supabase
+                    .from('resenias')
+                    .insert(this.new_resenia)
+                if (error) throw error;
+
+                await this.getReseniasBySitioId(this.sitioActive.id);
+                this.openNewReseniaModal = false;
+                // Reset new_resenia
+                this.new_resenia = {
+                    users_id: null,
+                    sitios_id: null,
+                    calificacion: 1,
+                    comentario: ''
+                };
+            } catch (e) {
+                console.error('Error adding new resenia:', e);
             }
         }
     },

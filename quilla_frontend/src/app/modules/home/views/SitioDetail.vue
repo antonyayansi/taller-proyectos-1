@@ -112,7 +112,7 @@
 
             <!-- Tabs Section -->
             <div class="mt-6 mx-4">
-                <Tabs value="0" class="bg-white dark:bg-zinc-800 rounded-2xl shadow-lg overflow-hidden">
+                <Tabs v-model:value="tap" class="bg-white dark:bg-zinc-800 rounded-2xl shadow-lg overflow-hidden">
                     <TabList class="border-b border-zinc-200 dark:border-zinc-700 px-4">
                         <Tab value="0" class="px-6 py-3 font-medium">
                             <i class="pi pi-map mr-2"></i>
@@ -129,7 +129,7 @@
                     </TabList>
                     <TabPanels class="p-4">
                         <TabPanel value="0">
-                            <Rutas />
+                            <Rutas v-if="tap === '0'" />
                         </TabPanel>
                         <TabPanel value="1">
                             <!-- Image Gallery Grid -->
@@ -149,11 +149,7 @@
                             </div>
                         </TabPanel>
                         <TabPanel value="2">
-                            <div class="text-center py-12 text-zinc-500">
-                                <i class="pi pi-star text-4xl mb-3 block"></i>
-                                <p>No hay reseñas disponibles</p>
-                                <Button label="Escribir reseña" class="mt-4" outlined />
-                            </div>
+                            <Resenias v-if="tap === '2'" />
                         </TabPanel>
                     </TabPanels>
                 </Tabs>
@@ -181,14 +177,16 @@ import {
     TabPanels,
     TabPanel
 } from 'primevue';
-import { onMounted } from 'vue';
+import { onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import useSitios from '../hooks/useSitios';
 import Rutas from '../components/Rutas.vue';
 import useHome from '../hooks/useHome';
 import usePerfil from '../../profile/hooks/usePerfil';
+import Resenias from '../components/Resenias.vue';
 
 const route = useRoute()
+const tap = ref('0');
 
 const {
     sitioActive,

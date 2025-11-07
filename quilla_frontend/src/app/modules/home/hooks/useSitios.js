@@ -10,7 +10,9 @@ const useSitios = () => {
         searchSitios: sitios().searchSitios,
         addSitesToMap: sitios().addSitesToMap,
         getSitiosById: sitios().getSitiosById,
-        textToSpeech: sitios().textToSpeech
+        textToSpeech: sitios().textToSpeech,
+        getReseniasBySitioId: sitios().getReseniasBySitioId,
+        addNewResenia: sitios().addNewResenia,
     }
 }
 
