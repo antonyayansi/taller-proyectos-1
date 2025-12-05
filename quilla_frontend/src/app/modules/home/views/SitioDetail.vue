@@ -15,6 +15,9 @@
             </div>
         </div>
 
+        <!-- AI Assistant Component -->
+        <AIAssistant v-if="sitioActive" :sitioContext="sitioActive" />
+
         <!-- Content -->
         <div v-if="sitioActive" class="pb-8">
             <!-- Hero Image with Gradient Overlay -->
@@ -184,6 +187,7 @@ import Rutas from '../components/Rutas.vue';
 import useHome from '../hooks/useHome';
 import usePerfil from '../../profile/hooks/usePerfil';
 import Resenias from '../components/Resenias.vue';
+import AIAssistant from '@/app/components/AIAssistant.vue';
 
 const route = useRoute()
 const router = useRouter()

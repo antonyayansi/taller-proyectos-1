@@ -1,5 +1,8 @@
 <template>
     <div class="min-h-screen bg-gradient-to-br from-teal-500 to-teal-600 p-5">
+        <!-- AI Assistant Component -->
+        <AIAssistant v-if="sitioActive" :sitioContext="sitioActive" />
+        
         <!-- Loading State -->
         <div v-if="!sitioActive" class="flex items-center justify-center min-h-screen">
             <div class="text-center text-white">
@@ -115,6 +118,7 @@
 import { ref, onMounted, onUnmounted } from 'vue';
 import useNavigation from '../hooks/useNavigation';
 import { useRoute } from 'vue-router';
+import AIAssistant from '@/app/components/AIAssistant.vue';
 
 const {
     getSitiosById,
