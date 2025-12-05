@@ -1,7 +1,8 @@
 import { defineStore } from 'pinia'
 import { Geolocation } from '@capacitor/geolocation'
-import { addMarker, loadMapa } from '@/services/gps';
+import { addMarker, loadMapa, calculateDistance } from '@/services/gps';
 import { Network } from '@capacitor/network';
+import { toast } from 'vue-sonner';
 
 const initLatLng = { lat: -13.516985, lng: -71.978113 };
 
@@ -17,6 +18,10 @@ export const home = defineStore('home', {
     isMapLoaded: false, // Flag para saber si el mapa está completamente cargado
     watchId: null, // ID del watcher de ubicación en tiempo real
     currentMarker: null, // Marcador de la ubicación actual
+    
+    // Control de proximidad a sitios turísticos
+    notifiedSites: new Set(), // Sitios sobre los que ya se notificó
+    proximityThreshold: 100, // Distancia en metros para activar notificación
 
     // Configuración del narrador
     narratorConfig: {
@@ -36,7 +41,8 @@ export const home = defineStore('home', {
       currentTime: 0,
       duration: 0,
       title: '',
-      loading: false
+      loading: false,
+      audioBlob: null // Guardar el blob para poder guardarlo
     },
     statusNetwork: true,
   }),
@@ -107,6 +113,9 @@ export const home = defineStore('home', {
                   lng: position.coords.longitude
                 });
               }
+
+              // Verificar proximidad a sitios turísticos
+              this.checkNearbyTouristSpots();
             }
           }
         );
@@ -123,7 +132,63 @@ export const home = defineStore('home', {
       if (this.watchId !== null) {
         await Geolocation.clearWatch({ id: this.watchId });
         this.watchId = null;
+        this.notifiedSites.clear(); // Limpiar sitios notificados
         console.log('Seguimiento de ubicación detenido');
+      }
+    },
+
+    // Verificar proximidad a sitios turísticos
+    async checkNearbyTouristSpots() {
+      // Importar el store de sitios dinámicamente para evitar dependencias circulares
+      const { sitios } = await import('./sitios');
+      const sitiosStore = sitios();
+      
+      if (!this.ubicacionActual.lat || !this.ubicacionActual.lng) {
+        return;
+      }
+
+      if (!sitiosStore.sitios || sitiosStore.sitios.length === 0) {
+        return;
+      }
+
+      // Verificar cada sitio turístico
+      for (const sitio of sitiosStore.sitios) {
+        try {
+          const distance = await calculateDistance(
+            this.ubicacionActual.lat,
+            this.ubicacionActual.lng,
+            sitio.lat,
+            sitio.lng
+          );
+
+          // Si está dentro del rango y no se ha notificado antes
+          if (distance <= this.proximityThreshold && !this.notifiedSites.has(sitio.id)) {
+            this.notifiedSites.add(sitio.id);
+            
+            // Mostrar notificación
+            toast.success(`¡Estás cerca de ${sitio.nombre}!`, {
+              description: `A ${distance.toFixed(0)} metros. Reproduciendo audio...`,
+              duration: 5000,
+            });
+
+            // Reproducir audio del sitio si está disponible
+            if (sitio.descripcion) {
+              await sitiosStore.textToSpeech(
+                sitio.descripcion,
+                sitio.nombre,
+                false,
+                sitio.id
+              );
+            }
+          }
+          
+          // Si se aleja más de 200 metros, permitir notificar nuevamente
+          if (distance > this.proximityThreshold * 2 && this.notifiedSites.has(sitio.id)) {
+            this.notifiedSites.delete(sitio.id);
+          }
+        } catch (error) {
+          console.error(`Error calculando distancia para ${sitio.nombre}:`, error);
+        }
       }
     },
 
@@ -200,6 +265,7 @@ export const home = defineStore('home', {
       this.audioPlayer.audio = new Audio(audioUrl);
       this.audioPlayer.audio.volume = this.narratorConfig.volume;
       this.audioPlayer.title = title;
+      this.audioPlayer.audioBlob = audioBlob; // Guardar el blob
 
       // Event listeners
       this.audioPlayer.audio.addEventListener('loadedmetadata', () => {
@@ -247,6 +313,49 @@ export const home = defineStore('home', {
         this.audioPlayer.currentTime = 0;
         this.audioPlayer.duration = 0;
         this.audioPlayer.title = '';
+        this.audioPlayer.audioBlob = null;
+      }
+    },
+
+    async saveCurrentAudio() {
+      if (!this.audioPlayer.audioBlob) {
+        throw new Error('No hay audio para guardar');
+      }
+
+      try {
+        // Importar dinámicamente para evitar problemas de dependencias circulares
+        const { Filesystem, Directory } = await import('@capacitor/filesystem');
+
+        // Convertir blob a base64
+        const reader = new FileReader();
+        const base64Data = await new Promise((resolve, reject) => {
+          reader.onloadend = () => {
+            const base64 = reader.result.split(',')[1];
+            resolve(base64);
+          };
+          reader.onerror = reject;
+          reader.readAsDataURL(this.audioPlayer.audioBlob);
+        });
+
+        // Generar nombre de archivo único
+        const timestamp = Date.now();
+        const sanitizedTitle = this.audioPlayer.title
+          .replace(/[^a-z0-9]/gi, '_')
+          .toLowerCase()
+          .substring(0, 50);
+        const fileName = `${sanitizedTitle}_${timestamp}.mp3`;
+
+        // Guardar archivo
+        await Filesystem.writeFile({
+          path: fileName,
+          data: base64Data,
+          directory: Directory.Data,
+        });
+
+        return fileName;
+      } catch (error) {
+        console.error('Error al guardar audio:', error);
+        throw error;
       }
     },
 

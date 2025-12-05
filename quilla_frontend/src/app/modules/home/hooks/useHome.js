@@ -9,6 +9,7 @@ const useHome = () => {
     obtenerUbicacion: home().obtenerUbicacion,
     startWatchingPosition: home().startWatchingPosition,
     stopWatchingPosition: home().stopWatchingPosition,
+    checkNearbyTouristSpots: home().checkNearbyTouristSpots,
     getMapa: home().getMapa,
     setMapContainer: home().setMapContainer,
     playAudio: home().playAudio,
@@ -17,7 +18,8 @@ const useHome = () => {
     seekAudio: home().seekAudio,
     setVolume: home().setVolume,
     setLoading: home().setLoading,
-    checkNetwork: home().checkNetwork
+    checkNetwork: home().checkNetwork,
+    saveCurrentAudio: home().saveCurrentAudio
   }
 }
 

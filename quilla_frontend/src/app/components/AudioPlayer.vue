@@ -38,6 +38,9 @@
                         </div>
                     </div>
                     <div class="flex items-center gap-2 flex-shrink-0">
+                        <Button @click="handleSaveAudio" icon="pi pi-save" text rounded severity="success"
+                            v-tooltip.top="'Guardar audio'" :loading="isSaving" 
+                            :disabled="!audioPlayer.audioBlob" />
                         <Button @click="toggleMinimize" icon="pi pi-minus" text rounded severity="secondary"
                             v-tooltip.top="'Minimizar'" />
                         <Button @click="stopAudio" icon="pi pi-times" text rounded severity="secondary"
@@ -83,6 +86,7 @@
 import { Button, Slider } from 'primevue';
 import { computed, watch, ref } from 'vue';
 import useHome from '../modules/home/hooks/useHome';
+import { toast } from 'vue-sonner';
 
 const {
     audioPlayer,
@@ -90,14 +94,35 @@ const {
     togglePlayPause,
     stopAudio,
     seekAudio,
-    setVolume
+    setVolume,
+    saveCurrentAudio
 } = useHome();
 
 const currentTime = ref(0);
 const isMinimized = ref(false);
+const isSaving = ref(false);
 
 const toggleMinimize = () => {
     isMinimized.value = !isMinimized.value;
+};
+
+// Guardar audio actual
+const handleSaveAudio = async () => {
+    isSaving.value = true;
+    try {
+        const fileName = await saveCurrentAudio();
+        toast.success('Audio guardado exitosamente', {
+            description: `Archivo: ${fileName}`,
+            duration: 3000
+        });
+    } catch (error) {
+        console.error('Error al guardar:', error);
+        toast.error('Error al guardar el audio', {
+            description: error.message || 'Intenta nuevamente'
+        });
+    } finally {
+        isSaving.value = false;
+    }
 };
 
 // Sincronizar currentTime con el reproductor

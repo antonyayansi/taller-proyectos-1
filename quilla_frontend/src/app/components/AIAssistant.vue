@@ -182,6 +182,9 @@ if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
             toast.error('No se detectó ninguna voz');
         } else if (event.error === 'not-allowed') {
             toast.error('Permiso de micrófono denegado');
+        } else if (event.error === 'aborted') {
+            // Error abortado, no mostrar mensaje
+            return;
         } else {
             toast.error('Error en el reconocimiento de voz');
         }
@@ -189,6 +192,10 @@ if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
 
     recognition.onend = () => {
         isRecording.value = false;
+    };
+
+    recognition.onstart = () => {
+        isRecording.value = true;
     };
 }
 
@@ -211,20 +218,44 @@ const toggleVoiceRecording = () => {
     }
 
     if (isRecording.value) {
-        recognition.stop();
+        try {
+            recognition.stop();
+        } catch (error) {
+            console.error('Error al detener reconocimiento:', error);
+        }
         isRecording.value = false;
     } else {
         transcription.value = '';
         userInput.value = '';
-        isRecording.value = true;
         
         try {
+            // Asegurar que no hay una sesión activa antes de iniciar
+            if (isRecording.value) {
+                recognition.stop();
+            }
+            
+            isRecording.value = true;
             recognition.start();
             toast.info('Escuchando... Habla ahora');
         } catch (error) {
             console.error('Error al iniciar reconocimiento:', error);
             isRecording.value = false;
-            toast.error('Error al iniciar el micrófono');
+            
+            // Si el error es porque ya está iniciado, intentar detenerlo y reiniciar
+            if (error.message && error.message.includes('already started')) {
+                try {
+                    recognition.stop();
+                    setTimeout(() => {
+                        isRecording.value = true;
+                        recognition.start();
+                        toast.info('Escuchando... Habla ahora');
+                    }, 300);
+                } catch (retryError) {
+                    toast.error('Error al iniciar el micrófono');
+                }
+            } else {
+                toast.error('Error al iniciar el micrófono');
+            }
         }
     }
 };
