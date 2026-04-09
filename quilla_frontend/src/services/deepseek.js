@@ -3,7 +3,8 @@
  * Proporciona funcionalidades de chat y asistente IA
  */
 
-const DEEPSEEK_PROXY_URL = 'https://app.blocmin.com/api/deepseek/chat';
+const DEEPSEEK_API_URL = 'https://api.deepseek.com/chat/completions';
+const DEEPSEEK_API_KEY = 'sk-e093174e29764d05bfd0531c0206bd9a';
 
 /**
  * Envía un mensaje al asistente de DeepSeek
@@ -15,10 +16,11 @@ export async function askDeepSeek(message, context = {}) {
     try {
         const systemPrompt = buildSystemPrompt(context);
         
-        const response = await fetch(DEEPSEEK_PROXY_URL, {
+        const response = await fetch(DEEPSEEK_API_URL, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': `Bearer ${DEEPSEEK_API_KEY}`,
             },
             body: JSON.stringify({
                 model: 'deepseek-chat',

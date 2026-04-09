@@ -7,6 +7,7 @@
                 <p class="text-zinc-600 dark:text-zinc-300">{{ user.user_metadata.email }}</p>
             </div>
             <Options />
+            
         </div>
     </div>
     <div class="flex flex-col items-center justify-center h-screen" v-else>

@@ -212,7 +212,9 @@ export const sitios = defineStore("sitios", {
                 });
 
                 if (!response.ok) {
-                    throw new Error('Error en la solicitud de text-to-speech');
+                    const errorData = await response.json();
+                    console.error('TTS API Error:', errorData);
+                    throw new Error(errorData?.error?.message || 'Error en la solicitud de text-to-speech');
                 }
 
                 const result = await response.json();
