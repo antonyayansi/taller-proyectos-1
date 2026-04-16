@@ -14,7 +14,7 @@ export const uploadPostImage = async (file) => {
     console.log('🔍 Validando archivo:', {
       name: file.name,
       type: file.type,
-      size: file.size
+      size: file.size,
     })
 
     // Validar que sea una imagen
@@ -46,7 +46,7 @@ export const uploadPostImage = async (file) => {
     console.log('✅ Respuesta de S3:', response)
 
     // Construir URL pública de la imagen
-    const imageUrl = `https://siadegv2.s3.us-east-2.amazonaws.com/${fileName}`
+    const imageUrl = `https://rotux.s3.us-east-1.amazonaws.com/${fileName}`
 
     console.log('🔗 URL generada:', imageUrl)
 
@@ -67,10 +67,10 @@ export const uploadPostImage = async (file) => {
 export const compressImage = async (file, maxWidth = 1200, quality = 0.8) => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
-    
+
     reader.onload = (e) => {
       const img = new Image()
-      
+
       img.onload = () => {
         const canvas = document.createElement('canvas')
         let width = img.width
@@ -90,7 +90,7 @@ export const compressImage = async (file, maxWidth = 1200, quality = 0.8) => {
 
         // Determinar el tipo de imagen, default a JPEG si no es PNG
         const mimeType = file.type === 'image/png' ? 'image/png' : 'image/jpeg'
-        
+
         // Convertir a blob
         canvas.toBlob(
           (blob) => {
@@ -98,16 +98,16 @@ export const compressImage = async (file, maxWidth = 1200, quality = 0.8) => {
               reject(new Error('Error al comprimir la imagen'))
               return
             }
-            
+
             // Crear un nuevo archivo con el blob
             const compressedFile = new File([blob], file.name, {
               type: mimeType,
-              lastModified: Date.now()
+              lastModified: Date.now(),
             })
             resolve(compressedFile)
           },
           mimeType,
-          quality
+          quality,
         )
       }
 

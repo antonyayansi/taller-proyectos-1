@@ -10,6 +10,20 @@ export const auth = defineStore("auth", {
             const {
                 data: { user },
             } = await supabase.auth.getUser()
+            
+            if (user) {
+                const { data: perfil } = await supabase
+                    .from('perfiles')
+                    .select('rol')
+                    .eq('id', user.id)
+                    .single()
+                
+                if (perfil) {
+                    user.rol = perfil.rol;
+                } else {
+                    user.rol = 'usuario'; // rol por defecto mientras carga
+                }
+            }
             this.user = user;
         },
         async logout() {

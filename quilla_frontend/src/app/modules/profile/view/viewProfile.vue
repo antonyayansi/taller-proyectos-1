@@ -23,6 +23,7 @@ import {
     Button,
     Avatar
 } from 'primevue'
+import { Capacitor } from '@capacitor/core';
 import useAuth from '../../auth/hooks/useAuth';
 import { supabase } from '@/services/supabase/supabase';
 import Options from '../components/Options.vue';
@@ -39,10 +40,18 @@ const {
 } = usePerfil()
 
 const loginWithGoogle = async () => {
+    let redirectTo = `${window.location.origin}/`
+    
+    // Check if running in Capacitor
+    if (Capacitor.isNativePlatform()) {
+        // App's custom scheme registered in capacitor.config.json
+        redirectTo = 'quilla://auth/callback'
+    }
+
     await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-            redirectTo: `/`,
+            redirectTo,
         },
     })
 }
