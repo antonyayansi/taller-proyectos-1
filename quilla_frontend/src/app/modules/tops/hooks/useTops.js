@@ -7,7 +7,10 @@ export default function useTops() {
   const {
     posts,
     loading,
-    likedPosts
+    likedPosts,
+    comments,
+    loadingComments,
+    openCommentsPost
   } = storeToRefs(topsStore)
 
   const {
@@ -15,7 +18,11 @@ export default function useTops() {
     createPost,
     toggleLike,
     deletePost,
-    hasLiked
+    hasLiked,
+    toggleComments,
+    fetchComments,
+    addComment,
+    deleteComment
   } = topsStore
 
   return {
@@ -23,12 +30,18 @@ export default function useTops() {
     posts,
     loading,
     likedPosts,
-
+    comments,
+    loadingComments,
+    openCommentsPost,
     // Actions
     fetchPosts,
     createPost,
     toggleLike,
     deletePost,
-    hasLiked
+    hasLiked,
+    toggleComments,
+    fetchComments,
+    addComment,
+    deleteComment
   }
 }

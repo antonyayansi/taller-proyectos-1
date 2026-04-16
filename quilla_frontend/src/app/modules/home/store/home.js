@@ -200,24 +200,36 @@ export const home = defineStore('home', {
       this.isMapLoaded = false;
 
       try {
-        if (this.ubicacionActual.lat && this.ubicacionActual.lng) {
-          const data = await loadMapa(
-            this.mapContainer,
-            this.ubicacionActual,
-            'location',
-            false
-          );
-          this.map = data.map;
-          this.currentMarker = data.marker; // Guardar referencia al marcador
-        } else {
-          const data = await loadMapa(this.mapContainer, initLatLng, 'location', false, this.getNewLatLng);
-          this.map = data.map;
-          this.currentMarker = data.marker; // Guardar referencia al marcador
+        const latlng = (this.ubicacionActual.lat && this.ubicacionActual.lng)
+          ? this.ubicacionActual
+          : initLatLng;
+
+        // Si el mapa ya existe, re-adjuntarlo al nuevo contenedor DOM (evita recrearlo)
+        if (this.map) {
+          this.map.setDiv(this.mapContainer);
+          this.map.panTo(latlng);
+          // Mover marcador actual si existe
+          if (this.currentMarker) {
+            this.currentMarker.position = latlng;
+          }
+          this.isMapLoaded = true;
+          return;
         }
+
+        // Primera vez: crear el mapa
+        const data = await loadMapa(
+          this.mapContainer,
+          latlng,
+          'location',
+          false
+        );
+        this.map = data.map;
+        this.currentMarker = data.marker;
 
         // Marcar el mapa como cargado
         this.isMapLoaded = true;
       } catch (error) {
+        console.error('Error loading map:', error);
         this.isMapLoaded = false;
       }
     },
