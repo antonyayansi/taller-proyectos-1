@@ -24,15 +24,16 @@ export const useTopsStore = defineStore('tops', {
           .from('publicaciones')
           .select(`
             *,
-            autor:perfiles!publicaciones_users_id_fkey(nombre, avatar_url)
+            autor:perfiles(nombre, avatar_url),
+            conteo_comentarios:comentarios_publicaciones(count)
           `)
           .order('created_at', { ascending: false })
 
         if (error) {
-          // Fallback sin join si la relación no existe aún
+          // Fallback sin join
           const { data: fallbackData, error: fallbackError } = await supabase
             .from('publicaciones')
-            .select('*')
+            .select('*, conteo_comentarios:comentarios_publicaciones(count)')
             .order('created_at', { ascending: false })
           if (fallbackError) throw fallbackError
           this.posts = fallbackData || []
@@ -71,7 +72,7 @@ export const useTopsStore = defineStore('tops', {
           ])
           .select(`
             *,
-            autor:perfiles!publicaciones_users_id_fkey(nombre, avatar_url)
+            autor:perfiles(nombre, avatar_url)
           `)
 
         if (error) {
@@ -96,9 +97,10 @@ export const useTopsStore = defineStore('tops', {
         }
 
         if (data && data.length > 0) {
-          this.posts.unshift(data[0])
+          const newPost = { ...data[0], conteo_comentarios: [{ count: 0 }] }
+          this.posts.unshift(newPost)
           toast.success('Publicación creada exitosamente')
-          return data[0]
+          return newPost
         }
       } catch (error) {
         console.error('Error creating post:', error)
@@ -188,7 +190,7 @@ export const useTopsStore = defineStore('tops', {
           .from('comentarios_publicaciones')
           .select(`
             *,
-            autor:perfiles!comentarios_publicaciones_users_id_fkey(nombre, avatar_url)
+            autor:perfiles(nombre, avatar_url)
           `)
           .eq('publicacion_id', postId)
           .order('created_at', { ascending: true })
@@ -222,7 +224,7 @@ export const useTopsStore = defineStore('tops', {
           }])
           .select(`
             *,
-            autor:perfiles!comentarios_publicaciones_users_id_fkey(nombre, avatar_url)
+            autor:perfiles(nombre, avatar_url)
           `)
 
         if (error) throw error

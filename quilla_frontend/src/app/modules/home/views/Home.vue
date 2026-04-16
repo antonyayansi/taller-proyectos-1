@@ -1,79 +1,79 @@
 <template>
-    <div class="home-container">
+    <div class="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-emerald-50 dark:from-zinc-950 dark:via-zinc-900 dark:to-emerald-950 pb-20">
         <!-- Search bar -->
-        <div class="search-wrapper">
-            <div class="search-box">
-                <i class="pi pi-search search-icon"></i>
+        <div class="p-5 pb-3 sticky top-0 z-10 bg-indigo-50/85 dark:bg-zinc-950/85 backdrop-blur-xl border-b border-indigo-500/10 dark:border-indigo-500/20">
+            <div class="relative flex items-center">
+                <i class="pi pi-search absolute left-3.5 text-indigo-500 text-[15px] z-[1]"></i>
                 <InputText
                     @keyup="searchSitios($event.target.value)"
                     placeholder="Buscar sitios turísticos..."
                     fluid
-                    class="search-input"
+                    class="w-full pl-[42px] h-[46px] rounded-[14px] border-[1.5px] border-indigo-500/20 text-[15px] bg-white dark:bg-zinc-900 shadow-lg shadow-indigo-500/10 transition-all focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/15"
                 />
             </div>
         </div>
 
         <!-- Map section -->
-        <div class="map-section">
-            <div class="map-header">
-                <div class="map-header-left">
-                    <span class="map-label">
-                        <i class="pi pi-map-marker"></i>
+        <div class="mx-4 mt-3">
+            <div class="flex items-center justify-between mb-2.5">
+                <div class="flex items-center gap-2.5">
+                    <span class="flex items-center gap-1.5 text-[13px] font-medium text-zinc-600 dark:text-zinc-400">
+                        <i class="pi pi-map-marker text-indigo-500"></i>
                         Tu ubicación actual
                     </span>
-                    <span v-if="isMapLoaded" class="map-badge-live">
-                        <span class="live-dot"></span> EN VIVO
+                    <span v-if="isMapLoaded" class="inline-flex items-center gap-1 text-[10px] font-bold tracking-wider text-green-600 bg-green-500/10 border border-green-500/30 rounded-full px-2 py-0.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span> EN VIVO
                     </span>
                 </div>
-                <button class="btn-refresh" @click="obtenerUbicacion()">
-                    <i class="pi pi-refresh"></i>
+                <button class="flex items-center gap-1.5 text-[13px] font-semibold text-indigo-600 bg-indigo-500/10 border border-indigo-500/20 rounded-[10px] px-3 py-1.5 cursor-pointer transition-all hover:bg-indigo-500/20 hover:scale-[1.02]" @click="obtenerUbicacion()">
+                    <i class="pi pi-refresh text-xs"></i>
                     Actualizar
                 </button>
             </div>
 
             <!-- Map container -->
-            <div class="map-wrapper" :class="{ 'map-loading': !isMapLoaded }">
-                <div ref="mapContainer" class="map-element"></div>
+            <div class="relative rounded-[18px] overflow-hidden h-[200px] shadow-2xl shadow-indigo-500/20 border-2 border-indigo-500/15" :class="{ 'opacity-50': !isMapLoaded }">
+                <div ref="mapContainer" class="w-full h-full"></div>
                 <!-- Loading overlay -->
-                <div v-if="!isMapLoaded" class="map-overlay">
-                    <div class="map-spinner">
-                        <i class="pi pi-spin pi-spinner"></i>
-                        <span>Cargando mapa...</span>
+                <div v-if="!isMapLoaded" class="absolute inset-0 flex items-center justify-center bg-indigo-50/85 dark:bg-zinc-950/85 backdrop-blur-sm">
+                    <div class="flex flex-col items-center gap-2.5 text-indigo-600">
+                        <i class="pi pi-spin pi-spinner text-[28px]"></i>
+                        <span class="text-[13px] font-medium text-zinc-500 dark:text-zinc-400">Cargando mapa...</span>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Sites list -->
-        <div class="sites-section">
+        <div class="mx-4 mt-5">
             <div v-if="sitios.length > 0">
-                <div class="sites-header">
-                    <h2 class="sites-title">
-                        <i class="pi pi-globe"></i>
+                <div class="flex items-center justify-between mb-3.5">
+                    <h2 class="text-[17px] font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-1.5">
+                        <i class="pi pi-globe text-indigo-500"></i>
                         Sitios Turísticos
                     </h2>
-                    <span class="sites-count">{{ sitios.length }} lugares</span>
+                    <span class="text-xs font-semibold text-indigo-600 bg-indigo-500/10 border border-indigo-500/20 rounded-full px-2.5 py-1">{{ sitios.length }} lugares</span>
                 </div>
 
-                <div class="sites-list">
+                <div class="flex flex-col gap-3">
                     <router-link
                         v-for="sitio in sitios"
                         :key="sitio.id"
                         :to="{ name: 'home.sitio', params: { id: sitio.id } }"
-                        class="site-card"
+                        class="flex items-start gap-3.5 bg-white dark:bg-zinc-900 rounded-2xl p-4 border border-indigo-500/10 dark:border-indigo-500/20 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-indigo-500/20 hover:border-indigo-500/40 text-inherit no-underline"
                     >
-                        <div class="site-icon">
-                            <span class="site-emoji">📍</span>
+                        <div class="w-[46px] h-[46px] rounded-[14px] bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center shrink-0 shadow-lg shadow-indigo-500/30">
+                            <span class="text-[22px] leading-none">📍</span>
                         </div>
-                        <div class="site-info">
-                            <h3 class="site-name">{{ sitio.nombre }}</h3>
-                            <p class="site-desc">{{ sitio.descripcion }}</p>
-                            <div class="site-footer">
-                                <span v-if="sitio.distancia" class="site-distance">
-                                    <i class="pi pi-compass"></i>
+                        <div class="flex-1 min-w-0">
+                            <h3 class="text-base font-bold text-zinc-900 dark:text-zinc-100 m-0 leading-[1.3] line-clamp-2">{{ sitio.nombre }}</h3>
+                            <p class="text-[13px] text-zinc-500 dark:text-zinc-400 m-0 leading-normal line-clamp-2 mt-1">{{ sitio.descripcion }}</p>
+                            <div class="flex items-center justify-between mt-2.5">
+                                <span v-if="sitio.distancia" class="flex items-center gap-1 text-xs font-semibold text-green-600">
+                                    <i class="pi pi-compass text-[11px]"></i>
                                     {{ sitio.distancia }} m
                                 </span>
-                                <span class="site-cta">Ver más <i class="pi pi-angle-right"></i></span>
+                                <span class="text-[13px] font-semibold text-indigo-600 flex items-center gap-0.5">Ver más <i class="pi pi-angle-right"></i></span>
                             </div>
                         </div>
                     </router-link>
@@ -81,10 +81,10 @@
             </div>
 
             <!-- Loading state -->
-            <div v-else class="loading-state">
-                <div class="loading-spinner"></div>
-                <p class="loading-title">Cargando sitios turísticos...</p>
-                <p class="loading-sub">Esto solo tomará un momento</p>
+            <div v-else class="flex flex-col items-center justify-center py-12 px-4">
+                <div class="w-11 h-11 rounded-full border-[3px] border-indigo-500/15 border-t-indigo-500 animate-spin mb-4"></div>
+                <p class="text-base font-semibold text-zinc-600 dark:text-zinc-400 m-0">Cargando sitios turísticos...</p>
+                <p class="text-[13px] text-zinc-400 dark:text-zinc-500 m-0 mt-1">Esto solo tomará un momento</p>
             </div>
         </div>
     </div>
@@ -125,387 +125,3 @@ onBeforeUnmount(async () => {
     await stopWatchingPosition()
 })
 </script>
-
-<style scoped>
-.home-container {
-    min-height: 100vh;
-    background: linear-gradient(160deg, #f0f4ff 0%, #fdf4ff 50%, #f0fdf4 100%);
-    padding: 0 0 80px;
-}
-
-:global(.dark) .home-container {
-    background: linear-gradient(160deg, #0f0f1a 0%, #18101f 50%, #0a1410 100%);
-}
-
-/* Search */
-.search-wrapper {
-    padding: 20px 16px 12px;
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    background: rgba(240, 244, 255, 0.85);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-bottom: 1px solid rgba(99, 102, 241, 0.1);
-}
-
-:global(.dark) .search-wrapper {
-    background: rgba(15, 15, 26, 0.85);
-    border-bottom-color: rgba(99, 102, 241, 0.2);
-}
-
-.search-box {
-    position: relative;
-    display: flex;
-    align-items: center;
-}
-
-.search-icon {
-    position: absolute;
-    left: 14px;
-    color: #6366f1;
-    font-size: 15px;
-    z-index: 1;
-}
-
-.search-input {
-    width: 100%;
-    padding-left: 42px !important;
-    height: 46px;
-    border-radius: 14px !important;
-    border: 1.5px solid rgba(99, 102, 241, 0.2) !important;
-    font-size: 15px;
-    background: white;
-    box-shadow: 0 2px 12px rgba(99, 102, 241, 0.08);
-    transition: all 0.2s;
-}
-
-.search-input:focus {
-    border-color: #6366f1 !important;
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15) !important;
-}
-
-/* Map section */
-.map-section {
-    margin: 12px 16px 0;
-}
-
-.map-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 10px;
-}
-
-.map-header-left {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.map-label {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 13px;
-    font-weight: 500;
-    color: #52525b;
-}
-
-:global(.dark) .map-label {
-    color: #a1a1aa;
-}
-
-.map-label i {
-    color: #6366f1;
-}
-
-.map-badge-live {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    color: #16a34a;
-    background: rgba(22, 163, 74, 0.1);
-    border: 1px solid rgba(22, 163, 74, 0.3);
-    border-radius: 20px;
-    padding: 2px 8px;
-}
-
-.live-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: #16a34a;
-    animation: pulse-dot 1.5s ease-in-out infinite;
-}
-
-@keyframes pulse-dot {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.5; transform: scale(0.7); }
-}
-
-.btn-refresh {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 13px;
-    font-weight: 600;
-    color: #6366f1;
-    background: rgba(99, 102, 241, 0.08);
-    border: 1px solid rgba(99, 102, 241, 0.2);
-    border-radius: 10px;
-    padding: 6px 12px;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.btn-refresh:hover {
-    background: rgba(99, 102, 241, 0.15);
-    transform: scale(1.02);
-}
-
-.btn-refresh i {
-    font-size: 12px;
-}
-
-.map-wrapper {
-    position: relative;
-    border-radius: 18px;
-    overflow: hidden;
-    height: 200px;
-    box-shadow: 0 4px 24px rgba(99, 102, 241, 0.18), 0 1px 4px rgba(0,0,0,0.08);
-    border: 2px solid rgba(99, 102, 241, 0.15);
-}
-
-.map-element {
-    width: 100%;
-    height: 100%;
-}
-
-.map-overlay {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(240, 244, 255, 0.85);
-    backdrop-filter: blur(4px);
-}
-
-:global(.dark) .map-overlay {
-    background: rgba(15, 15, 26, 0.85);
-}
-
-.map-spinner {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-    color: #6366f1;
-}
-
-.map-spinner i {
-    font-size: 28px;
-}
-
-.map-spinner span {
-    font-size: 13px;
-    font-weight: 500;
-    color: #71717a;
-}
-
-/* Sites section */
-.sites-section {
-    margin: 20px 16px 0;
-}
-
-.sites-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 14px;
-}
-
-.sites-title {
-    font-size: 17px;
-    font-weight: 700;
-    color: #18181b;
-    display: flex;
-    align-items: center;
-    gap: 7px;
-}
-
-:global(.dark) .sites-title {
-    color: #fafafa;
-}
-
-.sites-title i {
-    color: #6366f1;
-}
-
-.sites-count {
-    font-size: 12px;
-    font-weight: 600;
-    color: #6366f1;
-    background: rgba(99, 102, 241, 0.1);
-    border: 1px solid rgba(99, 102, 241, 0.2);
-    border-radius: 20px;
-    padding: 3px 10px;
-}
-
-.sites-list {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.site-card {
-    display: flex;
-    align-items: flex-start;
-    gap: 14px;
-    background: white;
-    border-radius: 16px;
-    padding: 16px;
-    border: 1px solid rgba(99, 102, 241, 0.1);
-    box-shadow: 0 2px 12px rgba(0,0,0,0.05);
-    text-decoration: none;
-    color: inherit;
-    transition: all 0.25s ease;
-}
-
-:global(.dark) .site-card {
-    background: #1c1c2e;
-    border-color: rgba(99, 102, 241, 0.2);
-    box-shadow: 0 2px 12px rgba(0,0,0,0.3);
-}
-
-.site-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 30px rgba(99, 102, 241, 0.18);
-    border-color: rgba(99, 102, 241, 0.35);
-}
-
-.site-icon {
-    width: 46px;
-    height: 46px;
-    border-radius: 14px;
-    background: linear-gradient(135deg, #6366f1, #a855f7);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
-}
-
-.site-emoji {
-    font-size: 22px;
-    line-height: 1;
-}
-
-.site-info {
-    flex: 1;
-    min-width: 0;
-}
-
-.site-name {
-    font-size: 16px;
-    font-weight: 700;
-    color: #18181b;
-    margin: 0 0 4px;
-    line-height: 1.3;
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-}
-
-:global(.dark) .site-name {
-    color: #fafafa;
-}
-
-.site-desc {
-    font-size: 13px;
-    color: #71717a;
-    margin: 0 0 10px;
-    line-height: 1.5;
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-}
-
-:global(.dark) .site-desc {
-    color: #a1a1aa;
-}
-
-.site-footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.site-distance {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 12px;
-    font-weight: 600;
-    color: #16a34a;
-}
-
-.site-distance i {
-    font-size: 11px;
-}
-
-.site-cta {
-    font-size: 13px;
-    font-weight: 600;
-    color: #6366f1;
-    display: flex;
-    align-items: center;
-    gap: 2px;
-}
-
-/* Loading state */
-.loading-state {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 48px 16px;
-}
-
-.loading-spinner {
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    border: 3px solid rgba(99, 102, 241, 0.15);
-    border-top-color: #6366f1;
-    animation: spin 0.8s linear infinite;
-    margin-bottom: 16px;
-}
-
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
-
-.loading-title {
-    font-size: 16px;
-    font-weight: 600;
-    color: #52525b;
-    margin: 0 0 6px;
-}
-
-:global(.dark) .loading-title {
-    color: #a1a1aa;
-}
-
-.loading-sub {
-    font-size: 13px;
-    color: #a1a1aa;
-    margin: 0;
-}
-</style>

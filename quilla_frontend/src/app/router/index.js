@@ -21,6 +21,11 @@ export default {
       component: () => import('../modules/tops/view/viewTop.vue'),
     },
     {
+      name: 'tops.detail',
+      path: '/tops/:id',
+      component: () => import('../modules/tops/view/PostDetail.vue'),
+    },
+    {
       name: 'profile',
       path: '/profile',
       component: () => import('../modules/profile/view/viewProfile.vue'),
