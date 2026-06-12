@@ -1,0 +1,60 @@
+<template>
+    <div v-if="user" class="mx-4 text-center">
+        <div v-if="user?.user_metadata" class="my-6">
+            <div class="flex flex-col space-y-2 items-center justify-center">
+                <Avatar :image="user.user_metadata.avatar_url" size="xlarge" shape="circle" />
+                <h2 class="text-2xl font-semibold mb-2">{{ user.user_metadata.full_name }}</h2>
+                <p class="text-zinc-600 dark:text-zinc-300">{{ user.user_metadata.email }}</p>
+            </div>
+            <Options />
+            
+        </div>
+    </div>
+    <div class="flex flex-col items-center justify-center h-screen" v-else>
+        <div class="p-4">
+            <Button @click="loginWithGoogle" fluid icon="pi pi-google" severity="secondary"
+                label="Iniciar con Google" />
+        </div>
+    </div>
+</template>
+
+<script setup>
+import {
+    Button,
+    Avatar
+} from 'primevue'
+import { Capacitor } from '@capacitor/core';
+import useAuth from '../../auth/hooks/useAuth';
+import { supabase } from '@/services/supabase/supabase';
+import Options from '../components/Options.vue';
+import usePerfil from '../hooks/usePerfil';
+
+const hostname = window.location.hostname
+
+const {
+    user
+} = useAuth()
+
+const {
+    listarAudiosGuardados
+} = usePerfil()
+
+const loginWithGoogle = async () => {
+    let redirectTo = `${window.location.origin}/`
+    
+    // Check if running in Capacitor
+    if (Capacitor.isNativePlatform()) {
+        // App's custom scheme registered in capacitor.config.json
+        redirectTo = 'quilla://auth/callback'
+    }
+
+    await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+            redirectTo,
+        },
+    })
+}
+
+listarAudiosGuardados()
+</script>
