@@ -125,6 +125,7 @@ import { ref, computed, nextTick, watch } from 'vue';
 import { Button, InputText } from 'primevue';
 import { toast } from 'vue-sonner';
 import { askDeepSeek, getErrorMessage } from '@/services/deepseek';
+import { isMicrophoneSupported, requestMicrophonePermission } from '@/services/microphone';
 import useSitios from '../modules/home/hooks/useSitios';
 
 const props = defineProps({
@@ -211,8 +212,38 @@ const toggleAssistant = () => {
     }
 };
 
-const toggleVoiceRecording = () => {
-    if (!recognition) {
+const startVoiceRecognition = () => {
+    try {
+        if (isRecording.value) {
+            recognition.stop();
+        }
+
+        isRecording.value = true;
+        recognition.start();
+        toast.info('Escuchando... Habla ahora');
+    } catch (error) {
+        console.error('Error al iniciar reconocimiento:', error);
+        isRecording.value = false;
+
+        if (error.message?.includes('already started')) {
+            try {
+                recognition.stop();
+                setTimeout(() => {
+                    isRecording.value = true;
+                    recognition.start();
+                    toast.info('Escuchando... Habla ahora');
+                }, 300);
+            } catch (retryError) {
+                toast.error('Error al iniciar el micrófono');
+            }
+        } else {
+            toast.error('Error al iniciar el micrófono');
+        }
+    }
+};
+
+const toggleVoiceRecording = async () => {
+    if (!recognition || !isMicrophoneSupported()) {
         toast.error('El reconocimiento de voz no está disponible en este dispositivo');
         return;
     }
@@ -224,40 +255,19 @@ const toggleVoiceRecording = () => {
             console.error('Error al detener reconocimiento:', error);
         }
         isRecording.value = false;
-    } else {
-        transcription.value = '';
-        userInput.value = '';
-        
-        try {
-            // Asegurar que no hay una sesión activa antes de iniciar
-            if (isRecording.value) {
-                recognition.stop();
-            }
-            
-            isRecording.value = true;
-            recognition.start();
-            toast.info('Escuchando... Habla ahora');
-        } catch (error) {
-            console.error('Error al iniciar reconocimiento:', error);
-            isRecording.value = false;
-            
-            // Si el error es porque ya está iniciado, intentar detenerlo y reiniciar
-            if (error.message && error.message.includes('already started')) {
-                try {
-                    recognition.stop();
-                    setTimeout(() => {
-                        isRecording.value = true;
-                        recognition.start();
-                        toast.info('Escuchando... Habla ahora');
-                    }, 300);
-                } catch (retryError) {
-                    toast.error('Error al iniciar el micrófono');
-                }
-            } else {
-                toast.error('Error al iniciar el micrófono');
-            }
-        }
+        return;
     }
+
+    transcription.value = '';
+    userInput.value = '';
+
+    const granted = await requestMicrophonePermission();
+    if (!granted) {
+        toast.error('Permiso de micrófono denegado. Actívalo en la configuración del dispositivo.');
+        return;
+    }
+
+    startVoiceRecognition();
 };
 
 const sendMessage = async () => {

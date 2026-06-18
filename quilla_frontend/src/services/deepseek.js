@@ -4,7 +4,7 @@
  */
 
 const DEEPSEEK_API_URL = 'https://api.deepseek.com/chat/completions';
-const DEEPSEEK_API_KEY = 'sk-e093174e29764d05bfd0531c0206bd9a';
+const DEEPSEEK_API_KEY = import.meta.env.VITE_DEEPSEEK_API_KEY;
 
 /**
  * Envía un mensaje al asistente de DeepSeek

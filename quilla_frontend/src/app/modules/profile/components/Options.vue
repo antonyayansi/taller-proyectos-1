@@ -73,6 +73,13 @@
                     <i class="pi pi-chevron-right"></i>
                 </div>
             </li>
+
+            <li @click="openAcercaDE = true">
+                <div class="flex justify-between items-center cursor-pointer">
+                    <span><i class="pi pi-queston"></i> Acerca de</span>
+                    <i class="pi pi-chevron-right"></i>
+                </div>
+            </li>
         </ul>
     </div>
     <Drawer v-model:visible="openDrawer" :header="optionSelected" position="bottom"
@@ -84,6 +91,9 @@
         <AdminCategorias v-if="optionSelected === 'Tablas Maestras'" />
         <GuiaSitios v-if="optionSelected === 'Crear sitio turístico'" />
         <GuiaImagenes v-if="optionSelected === 'Subir Imágenes'" />
+    </Drawer>
+    <Drawer v-model:visible="openAcercaDE">
+        <h1>Autor Antony Elio Ayansi Huisa</h1>
     </Drawer>
 </template>
 
@@ -99,10 +109,13 @@ import AdminUsuarios from './AdminUsuarios.vue';
 import AdminCategorias from './AdminCategorias.vue';
 import GuiaSitios from './GuiaSitios.vue';
 import GuiaImagenes from './GuiaImagenes.vue';
+import Dialog from 'primevue/dialog'
 
 const isDark = useDark()
 const openDrawer = ref(false)
 const optionSelected = ref(null)
+
+const openAcercaDE = ref(false)
 
 const {
     user,
