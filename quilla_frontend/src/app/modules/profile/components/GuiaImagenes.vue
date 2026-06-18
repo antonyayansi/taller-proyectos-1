@@ -112,7 +112,7 @@ const subirImagenes = async () => {
         for (const { file } of archivosSeleccionados.value) {
             const fileName = `sitios/${sitioSeleccionado.value}/${Date.now()}-${file.name.replace(/\s+/g, '_')}`;
             await uploadFileToS3(fileName, file);
-            const url = `https://rotux.s3.us-east-1.amazonaws.com/${fileName}`;
+            const url = `https://${import.meta.env.VITE_AWS_BUCKET_NAME}.s3.${import.meta.env.VITE_AWS_REGION}.amazonaws.com/${fileName}`;
             await supabase.from('imagenes_sitio').insert([{ sitios_id: sitioSeleccionado.value, url }]);
         }
         toast.success(`${archivosSeleccionados.value.length} imágenes subidas con éxito.`);

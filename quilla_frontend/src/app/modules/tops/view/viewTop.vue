@@ -178,7 +178,6 @@ onMounted(async () => {
 <template>
   <div class="min-h-screen bg-gradient-to-br from-violet-50 via-fuchsia-50 to-blue-50 dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-950 pb-20">
     <div class="max-w-2xl mx-auto p-4 flex flex-col gap-4">
-
       <!-- ── Crear publicación ── -->
       <div class="bg-white dark:bg-zinc-900 rounded-[20px] p-[18px] shadow-xl shadow-indigo-500/5 border border-indigo-500/10 dark:border-indigo-500/20 flex flex-col gap-3">
         <div class="flex items-center gap-3">

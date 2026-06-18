@@ -68,7 +68,7 @@ export const useGuiaStore = defineStore('guia', {
             await uploadFileToS3(fileName, file)
 
             // Crear el registro de imagen
-            const imageUrl = `https://rotux.s3.us-east-1.amazonaws.com/${fileName}` // Adaptado a tu conf
+            const imageUrl = `https://${import.meta.env.VITE_AWS_BUCKET_NAME}.s3.${import.meta.env.VITE_AWS_REGION}.amazonaws.com/${fileName}` // Adaptado a tu conf
             await supabase
               .from('imagenes_sitio')
               .insert([{ sitios_id: nuevoSitio.id, url: imageUrl }])

@@ -46,7 +46,7 @@ export const uploadPostImage = async (file) => {
     console.log('✅ Respuesta de S3:', response)
 
     // Construir URL pública de la imagen
-    const imageUrl = `https://rotux.s3.us-east-1.amazonaws.com/${fileName}`
+    const imageUrl = `https://${import.meta.env.VITE_AWS_BUCKET_NAME}.s3.${import.meta.env.VITE_AWS_REGION}.amazonaws.com/${fileName}`
 
     console.log('🔗 URL generada:', imageUrl)
 
