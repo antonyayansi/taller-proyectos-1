@@ -64,7 +64,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-zinc-50 dark:bg-zinc-950 pb-20" v-if="post">
+  <div class="min-h-screen bg-zinc-50 dark:bg-zinc-950 pb-40" v-if="post">
     <!-- Header Navigation -->
     <div class="sticky top-0 z-[100] bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md flex items-center p-4 border-b border-zinc-200 dark:border-zinc-800">
       <button class="bg-transparent border-0 text-xl text-indigo-500 cursor-pointer mr-4 flex items-center justify-center" @click="router.back()">
@@ -170,8 +170,8 @@ onMounted(() => {
       </div>
     </div>
 
-    <!-- Sticky Comment Input -->
-    <div class="fixed bottom-0 left-0 right-0 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-lg p-4 border-t border-zinc-200 dark:border-zinc-800 pb-safe">
+    <!-- Sticky Comment Input (above bottom nav tabs) -->
+    <div class="fixed bottom-20 left-0 right-0 z-[60] bg-white/90 dark:bg-zinc-900/90 backdrop-blur-lg p-4 border-t border-zinc-200 dark:border-zinc-800 comment-input-bar">
       <div class="max-w-[600px] mx-auto flex gap-3 items-center">
         <Avatar 
           v-if="authStore.user?.user_metadata?.avatar_url" 
@@ -209,6 +209,10 @@ onMounted(() => {
 }
 
 .pb-safe {
-  padding-bottom: calc(1rem + env(safe-area-inset-bottom));
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.comment-input-bar {
+  padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
 }
 </style>
